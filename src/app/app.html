@@ -1,0 +1,8 @@
+<ion-menu [content]="content" type="push" [swipeEnabled]="menuSlide">
+    <ion-content>
+        <my-side-menu *ngIf="menuSlide"></my-side-menu>
+    </ion-content>
+</ion-menu>
+
+<ion-nav #content [root]="rootPage"></ion-nav>
+<app-spinner [visible]="spinner" [message]="spinnerMessage" *ngIf="spinner" ></app-spinner>

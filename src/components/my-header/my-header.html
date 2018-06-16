@@ -1,0 +1,34 @@
+<ion-navbar [color]="headerColor">
+    <button ion-button icon-only menuToggle *ngIf="menuEnable == true" >
+      <ion-icon name="menu"></ion-icon>
+    </button>
+  
+    <ion-title>
+      <img alt="logo" height="40" src="assets/images/logo_header.png" style="vertical-align:middle; margin-right: 3px"> 
+      <span>{{title}}</span>
+    </ion-title>
+  
+    <ion-buttons end *ngIf="btn1.enable && btn1.title == ''">
+      <button ion-button [color]="btn1.color" icon-only (click)="button1Click()">
+        <ion-icon [name]="btn1.icon"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons end *ngIf="btn1.enable && btn1.title != ''">
+        <button ion-button icon-end solid color="secondary" (click)="button1Click()">
+            {{btn1.title}}
+          <ion-icon [name]="btn1.icon"></ion-icon>
+        </button>
+    </ion-buttons>
+  
+    <ion-buttons end *ngIf="btn2.enable && btn2.title == ''">
+        <button ion-button [color]="btn2.color" icon-only (click)="button2Click()">
+          <ion-icon [name]="btn2.icon"></ion-icon>
+        </button>
+      </ion-buttons>
+    <ion-buttons end *ngIf="btn2.enable && btn2.title != ''">
+        <button ion-button icon-end solid color="secondary" (click)="button2Click()">
+            {{btn2.title}}
+          <ion-icon [name]="btn2.icon"></ion-icon>
+        </button>
+    </ion-buttons>
+  </ion-navbar>

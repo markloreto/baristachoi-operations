@@ -1,0 +1,79 @@
+<!--
+  Generated template for the StartupPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+    <my-header title="Setting Up..." headerColor="primary" [menuEnable]="false" ></my-header>
+  </ion-header>
+
+<ion-content padding>
+  <aw-wizard #wizard [navBarLayout]="'large-empty-symbols'" class="weezard weezard2 card">
+    <aw-wizard-step [canExit]="selectedDepot2" [stepTitle]="'Depot'" [navigationSymbol]="{ symbol: '&#xf015;', fontFamily: 'FontAwesome' }">
+      <div class="centered-content">
+        <fieldset>
+          <h2 class="fs-title">Depot</h2>
+          <h3 class="fs-subtitle">Let’s have a new beginning. Choose your assigned Depot</h3>
+          <ion-list [@listAnimation]="depotList.length" radio-group *ngIf="depotList.length" [(ngModel)]="selectedDepot">
+            <ion-item *ngFor="let item of depotList; let i = index;" >
+              <ion-label>{{item.name}}</ion-label>
+              <ion-radio value="{{item.id}}" (ionSelect)="selectDepot(item)"></ion-radio>
+            </ion-item>
+          </ion-list>
+          <div class="alert alert-warning background-warning" *ngIf="!depotList.length" >
+            <strong>Warning!</strong> List not loaded
+          </div>
+        </fieldset>
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" awNextStep>Next</button>
+        </div>
+      </div>
+    </aw-wizard-step>
+    <aw-wizard-step (stepEnter)="onStep1Next($event)" [stepTitle]="'Date &amp; Time'" [navigationSymbol]="{ symbol: '&#xf073;', fontFamily: 'FontAwesome' }">
+      <div class="centered-content">
+        <fieldset>
+          <h2 class="fs-title">Date &amp; Time</h2>
+          <h3 class="fs-subtitle">Let's make sure every moment is working</h3>
+          <div class="alert alert-info icons-alert">
+            {{dateTime}}
+          </div>
+          <ion-list>
+
+            <ion-item>
+              <ion-label>date &amp; time correct?</ion-label>
+              <ion-checkbox [(ngModel)]="dateTimeValue" (ionChange)="chkDateTime()"></ion-checkbox>
+            </ion-item>
+
+          </ion-list>
+        </fieldset>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" awNextStep>Next</button>
+        </div>
+      </div>
+    </aw-wizard-step>
+    <aw-wizard-step [stepTitle]="'Passcode'" [navigationSymbol]="{ symbol: '&#xf084;', fontFamily: 'FontAwesome' }">
+      <div class="centered-content">
+        <fieldset>
+          <h2 class="fs-title">Passcode</h2>
+          <h3 class="fs-subtitle">Access advanced settings and logins by setting up your passcode</h3>
+          <ion-list>
+
+            <ion-item>
+              <ion-label fixed>Passcode</ion-label>
+              <ion-input [type]="(passcode == '1234') ? 'text' : 'password'" [(ngModel)]="passcode" [min]="4" [max]="8"></ion-input>
+            </ion-item>
+
+          </ion-list>
+        </fieldset>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" awResetWizard>Reset</button>
+          <button type="button" class="btn btn-secondary" (click)="onComplete()">Complete</button>
+        </div>
+      </div>
+    </aw-wizard-step>
+  </aw-wizard>
+
+</ion-content>

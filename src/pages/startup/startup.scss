@@ -1,0 +1,214 @@
+page-startup {
+  .weezard aw-wizard-navigation-bar.horizontal.large-empty-symbols ul.steps-indicator li:not(:last-child):before{
+    background-color: #ffffff !important
+  }
+
+  .weezard aw-wizard-navigation-bar.horizontal.large-empty-symbols ul.steps-indicator li:after {
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  .weezard aw-wizard-navigation-bar.horizontal.large-empty-symbols ul.steps-indicator li.done:after {
+    color: #fff !important;
+    border: 2px solid #2ECC71 !important;
+    background: #2ECC71 !important
+  }
+
+  .weezard aw-wizard-navigation-bar.horizontal.large-empty-symbols ul.steps-indicator li.current:after {
+    color: #ffffff !important;
+    border: 2px solid #ffb012 !important;
+    background: #ffb012 !important;
+  }
+
+  .weezard aw-wizard-navigation-bar.horizontal ul.steps-indicator li div a{
+    color: #737373 !important;
+    font-size: 9px !important;
+    font-weight: 100 !important;
+    font-family: "Roboto", "Helvetica Neue", sans-serif !important;
+  }
+
+  .card-footer button{
+    margin-left: 5px;
+    margin-right: 5px
+  }
+  .modal-body .slimScrollDiv {
+    height: 350px !important;
+  }
+    html {
+        height: 100%;
+      }
+
+      .weezard2 a {
+        color: #737373;
+
+    }
+
+      .weezard2 #progressbar li.active {
+        color: #ffb012;
+      }
+
+      .content-md {
+        background-color: #e4e4e4;
+      }
+
+      body {
+        font-family: 'Source Sans Pro', sans-serif;
+        font-size: 14px;
+      }
+
+      .card {
+        border-radius: 0px;
+        border-top: 0px solid rgba(0, 115, 170, 0);
+        box-shadow: 0 2px 1px rgba(0, 0, 0, 0.0);
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        background-color: transparent;
+        margin-bottom: 30px;
+      }
+      .card .card-header{
+        background-color: transparent !important;
+        border-bottom: 0;
+        margin: 0 -35px;
+      }
+
+      .card .card-block {
+        padding: 0;
+        width: 100%;
+        margin: 0 auto;
+      }
+      .card .card-footer {
+        width: 100%;
+        margin: 0 auto;
+        border-radius: 0 0 7px 7px;
+        border-top: 1px solid rgba(0,0,0,.125) !important;
+        position: relative !important
+      }
+
+      .weezard2 ul li,.weezard2 li.active{
+        border-bottom: 0 !important;
+      }
+      .weezard2 .nav-item{
+        padding: 0 !important;
+        margin-bottom: 20px;
+      }
+      .weezard2 .nav-item > a{
+        font-size: 9px;
+        font-weight: 100;
+      }
+
+      .weezard2 #progressbar li.enabled:before, #progressbar li.enabled:after {
+        background: #ffb012 !important;
+        color: #fff;
+      }
+
+      .weezard2 {
+        margin: 50px auto;
+        text-align: center;
+        position: relative;
+      }
+
+      .weezard2 fieldset {
+        background: #fff;
+        border: 0 none;
+        border-radius: 7px 7px 0 0;
+        box-shadow: 0 0 30px 1px rgba(0, 0, 0, 0.1);
+        padding: 20px 20px 0 20px;
+        box-sizing: border-box;
+
+        position: relative;
+      }
+
+      .weezard2 fieldset:not(:first-of-type) {
+        display: none;
+      }
+      img.logo {
+        max-width: 120px;
+        margin-bottom: 20px;
+      }
+      .weezard2 p {
+        color: #8b9ab0;
+        font-size: 12px;
+      }
+
+      /* Headings */
+      .fs-title {
+        font-size: 26px;
+        font-weight: 200;
+        color: #434a54;
+        margin-bottom: 20px;
+      }
+      .fs-subtitle {
+        font-weight: 400;
+        color: #434a54;
+        margin-bottom: 20px;
+      }
+
+      .weezard2 .h3, h3 {
+        font-size: 100%;
+      }
+
+      .weezard2 .float-right, .weezard2 .float-left {
+        float: none !important;
+      }
+
+      .weezard2 .float-left {
+        color: #ffb012;
+        background-color: transparent;
+        border-color: #ffb012;
+      }
+
+      .weezard2 .float-right {
+        background-color: #ffb012;
+        border-color: #ffb012;
+        color: #fff;
+        cursor: pointer;
+        transition: all ease-in 0.3s;
+      }
+
+      #progressbar {
+        margin-bottom: 30px;
+        overflow: hidden;
+        counter-reset: step;
+      }
+      #progressbar li {
+        list-style-type: none;
+        color: #8b9ab0;
+        text-transform: uppercase;
+        font-size: 9px;
+        width: 33.33%;
+        float: left;
+        position: relative;
+      }
+      #progressbar li.active {
+        color: #e74c3c;
+      }
+      #progressbar li:before {
+        content: counter(step);
+        counter-increment: step;
+        width: 20px;
+        line-height: 20px;
+        display: block;
+        font-size: 10px;
+        color: #333;
+        background: white;
+        border-radius: 3em;
+        margin: 0 auto 5px auto;
+      }
+
+      #progressbar li:after {
+        content: '';
+        width: 100%;
+        height: 2px;
+        background: white;
+        position: absolute;
+        left: -50%;
+        top: 9px;
+        z-index: -1;
+      }
+      #progressbar li:first-child:after {
+        content: none;
+      }
+
+
+}

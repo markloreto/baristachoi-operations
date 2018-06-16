@@ -1,0 +1,71 @@
+// http://ionicframework.com/docs/theming/
+
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0px !important
+}
+
+.menu-inner {
+    width: 270px !important
+}
+
+.main-menu{
+    background-color: #fff !important
+}
+
+.btn-amber {
+    background-color: #ffb012;
+    border-color: #ffb012;
+    color: #fff;
+    cursor: pointer;
+    transition: all .3s ease-in;
+}
+
+.spinner-message {
+    right: 125%;
+    width: 15em;
+    position: relative;
+    text-align: center;
+    color: #513631
+}
+
+.swal2-modal .swal2-content{
+  font-size: 14px;
+  font-family: "Open Sans,sans-serif"
+}
+
+.swal2-modal .swal2-file:focus, .swal2-modal .swal2-input:focus, .swal2-modal .swal2-textarea:focus {
+  outline: 0;
+  border: 1px solid #ffb012;
+  -webkit-box-shadow: 0 0 3px #e4ae42;
+  box-shadow: 0 0 3px #e4ae42;
+}
+
+//fixes bootstrap to ionic
+.item-md .label{
+    font-size: inherit !important;
+    color: #000 !important;
+    font-weight: normal !important
+}
+
+.theme-loader {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+button:focus{
+    outline: none !important
+}
