@@ -75,12 +75,25 @@ export class MySideMenuComponent {
   isHeaderChecked: boolean;
 
   staff: any
+  myMenu: any = []
 
   constructor(
     public menuItems: MenuItems,
     public events: Events,
     public myFunctionProvider: MyFunctionProvider
   ) {
+    var myMenu = this.menuItems.getAll()
+    this.myMenu = myMenu
+    console.log("myMenu", myMenu)
+
+    this.myFunctionProvider.dbQuery("SELECT name FROM product_categories ORDER BY sequence", []).then((data: any) => {
+      var cat = []
+      for(var x in data){
+        cat.push({state: data[x].name.toLowerCase().replace(/\s/gim, "_"), name: data[x].name})
+      }
+      console.log("Categories", cat)
+      this.myMenu[0].main[0].children = cat
+    })
 
     this.events.subscribe("staff:login", (settings) => {
       this.loadIt(settings)

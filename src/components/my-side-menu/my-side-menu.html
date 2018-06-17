@@ -38,7 +38,7 @@
                 </div>
               </div>
               <div slimScroll width="100%" height="calc(100% - 0px)" size="4px" color="#fff" opacity="0.3" allowPageScroll="false">
-                <div *ngFor="let asideItems of menuItems.getAll()" class="d-color">
+                <div *ngFor="let asideItems of myMenu" class="d-color" >
                   <div class="pcoded-navigatio-lavel" [attr.menu-title-theme]="menuTitleTheme">{{asideItems.label}}</div>
                   <ul class="pcoded-item pcoded-left-item" [attr.item-border]="itemBorder" [attr.item-border-style]="itemBorderStyle" [attr.subitem-border]="subItemBorder" *ngFor="let asideItem of asideItems.main" appAccordionLink group="{{asideItem.state}}">
                     <li *ngIf="asideItem.type === 'external'" appAccordionLink attr.group="{{asideItem.state}}">

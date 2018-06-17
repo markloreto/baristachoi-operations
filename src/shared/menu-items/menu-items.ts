@@ -30,7 +30,20 @@ export interface Menu {
   main: MainMenuItems[];
 }
 
-const MENUITEMS = [
+var MENUITEMS = [
+  {
+    label: "Products",
+    main: [
+      {
+        state: 'categories',
+        short_label: 'C',
+        name: 'Categories',
+        type: 'sub',
+        icon: 'ti-layout-grid2-alt',
+        children: []
+      },
+    ]
+  },
   {
     label: 'Navigation',
     main: [
