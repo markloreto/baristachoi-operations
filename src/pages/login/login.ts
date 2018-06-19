@@ -1,4 +1,3 @@
-import { HomePage } from './../home/home';
 import { MyFunctionProvider } from './../../providers/my-function/my-function';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Events, MenuController } from 'ionic-angular';
@@ -26,7 +25,7 @@ export class LoginPage {
   ) {
     this.loadList()
     this.internetConnection = () => {
-
+      this.loadList()
     }
     this.events.subscribe("network:connected", this.internetConnection)
     console.log("Settings", this.myFunctionProvider.settings)
@@ -117,7 +116,7 @@ export class LoginPage {
           ["UPDATE settings SET data = ? WHERE id = ?", [staff.id, 5]]
         ]).then(() => {
           this.menuCtrl.swipeEnable(true)
-          this.navCtrl.setRoot(HomePage)
+          this.navCtrl.setRoot("HomePage")
 
           this.myFunctionProvider.setSettings().then((settings: any) => {
             this.events.publish("staff:login", settings)
