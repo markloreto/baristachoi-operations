@@ -10,6 +10,7 @@ export interface ChildrenItems {
   target?: boolean;
   name: string;
   type?: string;
+  data?: any;
   children?: ChildrenItems[];
 }
 

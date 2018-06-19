@@ -76,7 +76,7 @@
                       <ul class="pcoded-submenu">
                         <ng-template ngFor let-asideChildren [ngForOf]="asideItem.children">
                           <li *ngIf="asideChildren.type !== 'sub'">
-                            <a target="{{asideChildren.target ? '_blank' : '_self'}}">
+                            <a target="{{asideChildren.target ? '_blank' : '_self'}}" (click)="clickFunction(asideChildren)">
                               <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
                               <span class="pcoded-mtext">{{ asideChildren.name }} </span>
                               <span *ngFor="let asideChildrenBadge of asideChildren.badge" class="pcoded-badge label label-{{ asideChildrenBadge.type }}">{{asideChildrenBadge.value}}</span>
