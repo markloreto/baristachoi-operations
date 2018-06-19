@@ -89,7 +89,7 @@ export class MySideMenuComponent {
     this.myFunctionProvider.dbQuery("SELECT name FROM product_categories ORDER BY sequence", []).then((data: any) => {
       var cat = []
       for(var x in data){
-        cat.push({state: data[x].name.toLowerCase().replace(/\s/gim, "_"), name: data[x].name})
+        cat.push({badge: [{type: "warning", value: "100"}], state: data[x].name.toLowerCase().replace(/\s/gim, "_"), name: data[x].name, data: {item: "categories", id: data[x].id}})
       }
       console.log("Categories", cat)
       this.myMenu[0].main[0].children = cat
@@ -172,6 +172,13 @@ export class MySideMenuComponent {
 
   toggleOpenedSidebar() {
     this.isCollapsedSideBar = this.isCollapsedSideBar === 'yes-block' ? 'no-block' : 'yes-block';
+  }
+
+  clickFunction(item){
+    console.log(item)
+    if(item.data.item == "categories"){
+
+    }
   }
 
   logout(){
