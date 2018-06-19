@@ -69,10 +69,6 @@ export class StartupPage {
   ) {
     this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.CAMERA, this.androidPermissions.PERMISSION.READ_SMS, this.androidPermissions.PERMISSION.WRITE_CONTACTS, this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION]);
 
-    this.myFunctionProvider.APIGet("getProductCategories").then((result: any) => {
-      console.log("product categories", result)
-    })
-
     console.log(moment().toDate())
 
     this.internetConnection = () => {
@@ -189,18 +185,26 @@ export class StartupPage {
       console.log(result)
       if (result) {
         this.myFunctionProvider.spinner(true, "Building Database")
-        this.myFunctionProvider.dbQueryBatch([
-          ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [1, "time_in", this.myFunctionProvider.getTimestamp()]],
-          ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [2, "depot", JSON.stringify({name: this.selectedDepotName, id: this.selectedDepot})]],
-          ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [3, "passcode", this.passcode]],
-          ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [4, "logged_staff", null]],
-          ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [5, "accountable_staff", this.passcode]]
-        ]).then(() => {
+        this.myFunctionProvider.APIGet("getProductCategories").then((cats: any) => {
+          console.log("product categories", cats)
+          for(var x in cats.data){
+            this.myFunctionProvider.dbQuery("INSERT OR REPLACE INTO product_categories VALUES(?, ?, ?)", [cats.data[x].id, cats.data[x].name, cats.data[x].sequence])
+          }
 
-          this.myFunctionProvider.setSettings()
-          this.isCompleted = true;
-          this.navCtrl.setRoot("LoginPage")
-          this.myFunctionProvider.spinner(false, "")
+          this.myFunctionProvider.dbQueryBatch([
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [1, "time_in", this.myFunctionProvider.getTimestamp()]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [2, "depot", JSON.stringify({name: this.selectedDepotName, id: this.selectedDepot})]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [3, "passcode", this.passcode]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [4, "logged_staff", null]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [5, "accountable_staff", this.passcode]]
+          ]).then(() => {
+
+            this.myFunctionProvider.setSettings()
+            this.isCompleted = true;
+            this.navCtrl.setRoot("LoginPage")
+            this.myFunctionProvider.spinner(false, "")
+          })
+
         })
       }
     }).catch(e => {
