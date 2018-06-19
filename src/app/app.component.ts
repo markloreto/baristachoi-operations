@@ -1,4 +1,3 @@
-import { HomePage } from './../pages/home/home';
 import { MyFunctionProvider } from './../providers/my-function/my-function';
 import { Component, ViewChild } from '@angular/core';
 import { Platform, NavController, Menu, Nav, Events, IonicApp, MenuController } from 'ionic-angular';
@@ -118,10 +117,12 @@ export class MyApp {
       })
 
       this.network.onDisconnect().subscribe(() => {
+        console.log("Internet Disconnected")
         this.events.publish("network:disconnected")
       });
 
       this.network.onConnect().subscribe(() => {
+        console.log("Internet connected")
         this.events.publish("network:connected")
       });
 
@@ -140,7 +141,7 @@ export class MyApp {
             if(this.myFunctionProvider.settings.logged_staff != null){
               this.menuSlide = true
               this.menuCtrl.swipeEnable(true)
-              this.rootPage = HomePage
+              this.rootPage = "HomePage"
             }
             else{
               this.rootPage = "LoginPage"

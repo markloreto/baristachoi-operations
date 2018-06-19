@@ -1,10 +1,6 @@
 import { MyHeaderComponentModule } from './../components/my-header/my-header.module';
 import { RegistrationPage } from './../pages/registration/registration';
 import { MySideMenuComponent } from './../components/my-side-menu/my-side-menu';
-import { DashboardDefaultComponent } from './../components/dashboard-default/dashboard-default';
-import { AuthComponent } from './../components/auth/auth';
-import { TitleComponent } from './../components/title/title';
-import { BreadBreadcrumbsComponent } from './../components/bread-breadcrumbs/bread-breadcrumbs';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
@@ -15,7 +11,6 @@ import {ClickOutsideModule} from 'ng-click-outside';
 import {SharedModule} from '../shared/shared.module';
 
 import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
 import { HttpModule } from '@angular/http';
 
 import { OneSignal } from '@ionic-native/onesignal';
@@ -29,9 +24,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions';
 @NgModule({
   declarations: [
     MyApp,
-    HomePage,
     RegistrationPage,
-    DashboardDefaultComponent,
     MySideMenuComponent
   ],
   imports: [
@@ -46,7 +39,6 @@ import { AndroidPermissions } from '@ionic-native/android-permissions';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage,
     RegistrationPage
   ],
   providers: [
