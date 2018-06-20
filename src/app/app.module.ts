@@ -20,6 +20,9 @@ import { SQLite } from '@ionic-native/sqlite';
 import { Network } from '@ionic-native/network';
 import { OpenNativeSettings } from '@ionic-native/open-native-settings';
 import { AndroidPermissions } from '@ionic-native/android-permissions';
+import { Camera } from '@ionic-native/camera';
+import { ImageResizer } from '@ionic-native/image-resizer';
+import { File } from '@ionic-native/file';
 
 @NgModule({
   declarations: [
@@ -51,7 +54,10 @@ import { AndroidPermissions } from '@ionic-native/android-permissions';
     SQLite,
     Network,
     OpenNativeSettings,
-    AndroidPermissions
+    AndroidPermissions,
+    Camera,
+    ImageResizer,
+    File
   ]
 })
 export class AppModule {}

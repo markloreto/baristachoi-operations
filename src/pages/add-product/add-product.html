@@ -1,0 +1,72 @@
+<!--
+  Generated template for the AddProductPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+    <my-header title="Add new product" headerColor="primary" [menuEnable]="true" ></my-header>
+    <ion-toolbar>
+      <ion-segment [(ngModel)]="segment">
+        <ion-segment-button value="details">
+          Details
+        </ion-segment-button>
+        <ion-segment-button value="photo">
+          Photo
+        </ion-segment-button>
+        <ion-segment-button value="options">
+          Options
+        </ion-segment-button>
+      </ion-segment>
+      <ion-buttons end>
+        <button ion-button icon-only color="tertiary" (click)="submit()">
+          <ion-icon name="send"></ion-icon>
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding>
+  <div [ngSwitch]="segment">
+    <ion-list *ngSwitchCase="'details'">
+      <ion-item>
+        <ion-label>Name</ion-label>
+        <ion-input type="text" [(ngModel)]="name"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>SKU</ion-label>
+        <ion-input type="number" placeholder="Leave blank to auto generate" [(ngModel)]="sku"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Cost</ion-label>
+        <ion-input type="number" [(ngModel)]="cost"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Price</ion-label>
+        <ion-input type="number" [(ngModel)]="price"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Category</ion-label>
+        <ion-select [(ngModel)]="category">
+          <ion-option *ngFor="let item of categories" value="{{item.id}}">{{item.name}}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Measurement unit</ion-label>
+        <ion-select [(ngModel)]="measurement_unit">
+          <ion-option *ngFor="let item of measurement_units" value="{{item.id}}">{{item.name}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <ion-card *ngSwitchCase="'photo'">
+      <img [src]="image" alt="" class="img-fluid img-thumbnail" (click)="takePhoto()">
+    </ion-card>
+    <ion-list *ngSwitchCase="'options'">
+      <ion-item>
+        <ion-label>Shared</ion-label>
+        <ion-toggle [(ngModel)]="shared"></ion-toggle>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

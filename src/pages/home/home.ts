@@ -1,5 +1,5 @@
 import { MyFunctionProvider } from './../../providers/my-function/my-function';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavController, IonicPage } from 'ionic-angular';
 
 import '../../assets/charts/amchart/amcharts.js';
@@ -24,7 +24,7 @@ export class HomePage {
     public myFunctionProvider: MyFunctionProvider
   ) {
     this.text = 'Hello World';
-    //this.myFunctionProvider.syncPull(["product_categories"], true)
+    this.myFunctionProvider.syncPull(["product_categories", "measurement_units"], false)
   }
 
   ngOnInit() {

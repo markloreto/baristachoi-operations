@@ -3,6 +3,9 @@ import { Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 import { Events } from 'ionic-angular';
+import {DomSanitizer} from '@angular/platform-browser';
+import { Camera, CameraOptions } from '@ionic-native/camera';
+import { ImageResizer, ImageResizerOptions } from '@ionic-native/image-resizer';
 import moment from 'moment';
 import * as _ from 'lodash';
 /*
@@ -22,10 +25,15 @@ export class MyFunctionProvider {
   syncPullStep: number = 0
   syncPullTotalRecord: number = 0
   syncPullTables: any = []
+  nav: any
+  menuCtrl: any
   constructor(
     public http: Http,
     public sqlite: SQLite,
-    public events: Events
+    public events: Events,
+    private camera: Camera,
+    public sanitizer: DomSanitizer,
+    private imageResizer: ImageResizer
   ) {
     console.log('Hello MyFunctionProvider Provider');
 
@@ -46,6 +54,8 @@ export class MyFunctionProvider {
         this.dbQuery("CREATE TABLE IF NOT EXISTS staffs (id INTEGER PRIMARY KEY, depot_id INT, name TEXT, photo TEXT, thumbnail TEXT, role_id INT, created_at TEXT, updated_at TEXT, sync INT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS roles (id INTEGER PRIMARY KEY, name TEXT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS product_categories (id INTEGER PRIMARY KEY, name TEXT, sequence INT)", [])
+        this.dbQuery("CREATE TABLE IF NOT EXISTS measurement_units (id INTEGER PRIMARY KEY, name TEXT, abbr TEXT)", [])
+        this.dbQuery("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, photo TEXT, thumbnail TEXT, category INT, cost REAL, price REAL, author INT, measurement_unit INT, shareable INT, published INT, sku TEXT, sequence INT, sync INT)", [])
         //this.dbQuery("CREATE TABLE IF NOT EXISTS sync_tables (id INTEGER PRIMARY KEY, name TEXT, last_sync TEXT)", [])
 
         this.setSettings()
@@ -250,5 +260,93 @@ export class MyFunctionProvider {
     return moment().format("YYYY-MM-DD HH:mm:ss")
   }
 
+  //Files
+  fileInfo(path){
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(path, gotFile, fail);
+
+      function fail(e) {
+          console.log(e);
+      }
+
+      function gotFile(fileEntry) {
+        fileEntry.file(function(file) {
+            resolve(file)
+        });
+      }
+    })
+  }
+
+  getFileContentAsBase64(file){
+    return new Promise((resolve, reject) => {
+      var reader = new FileReader();
+      reader.onloadend = function(e) {
+          var content = this.result;
+          resolve(content)
+      };
+      // The most important point, use the readAsDatURL Method from the file plugin
+      reader.readAsDataURL(file);
+    })
+  }
+
+  //Images
+  takePicture(){
+    return new Promise((resolve, reject) => {
+      var self = this
+      const options: CameraOptions = {
+        quality: 100,
+        destinationType: this.camera.DestinationType.FILE_URI,
+        encodingType: this.camera.EncodingType.PNG,
+        mediaType: this.camera.MediaType.PICTURE,
+        targetWidth: 1024,
+        targetHeight: 768
+      }
+
+      this.camera.getPicture(options).then((uri) => {
+        var img = new Image();
+        img.onload = function() {
+          // Convert image
+          self.fileInfo(uri).then((fileData) => {
+            self.getFileContentAsBase64(fileData).then((b64) => {
+              self.resizeImage(uri, img.width * 0.25, img.height * 0.25).then((thumbnailUri) => {
+                self.fileInfo(thumbnailUri).then((thumbnailFileData) => {
+                  self.getFileContentAsBase64(thumbnailFileData).then((thumbnailB64) => {
+                    resolve({photo: b64, thumbnail: thumbnailB64})
+                  })
+                })
+              })
+            })
+          })
+        }
+        img.src = uri
+      }, (err) => {
+       // Handle error
+      });
+    })
+  }
+
+  resizeImage(uri, width, height){
+    return new Promise((resolve, reject) => {
+      let options = {
+        uri: uri,
+        folderName: 'Protonet',
+        quality: 100,
+        width: width,
+        height: height
+       } as ImageResizerOptions;
+
+       this.imageResizer
+         .resize(options)
+         .then((filePath: string) => {
+          console.log('FilePath', filePath)
+          resolve(filePath)
+         })
+         .catch(e => console.log(e));
+    })
+  }
+
+  sanitize(base64){
+    return this.sanitizer.bypassSecurityTrustUrl(base64);
+  }
 
 }

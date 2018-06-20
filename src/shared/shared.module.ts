@@ -15,6 +15,7 @@ import {CardComponent} from './card/card.component';
 import {CardRefreshDirective} from './card/card-refresh.directive';
 import {CardToggleDirective} from './card/card-toggle.directive';
 import {DataFilterPipe} from './element/data-filter.pipe';
+import { ModalAnimationComponent } from './modal-animation/modal-animation.component';
 
 @NgModule({
   imports: [
@@ -31,7 +32,8 @@ import {DataFilterPipe} from './element/data-filter.pipe';
     CardToggleDirective,
     SpinnerComponent,
     CardComponent,
-    DataFilterPipe
+    DataFilterPipe,
+    ModalAnimationComponent
   ],
   exports: [
     AccordionAnchorDirective,
@@ -44,7 +46,8 @@ import {DataFilterPipe} from './element/data-filter.pipe';
     NgbModule,
     SpinnerComponent,
     CardComponent,
-    DataFilterPipe
+    DataFilterPipe,
+    ModalAnimationComponent
   ],
   providers: [
     MenuItems

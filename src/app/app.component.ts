@@ -92,12 +92,15 @@ export class MyApp {
                 //this.appMinimize.minimize()
               }
               else{
-
+                this.nav.setRoot("HomePage")
               }
             }
           }
         }
       });
+
+      this.myFunctionProvider.nav = this.nav
+      this.myFunctionProvider.menuCtrl = this.menuCtrl
 
       this.events.subscribe("staff:logout", () => {
         this.myFunctionProvider.dbQuery("UPDATE settings SET data = ? WHERE id = ?", [null, 4]).then(() => {

@@ -1,6 +1,6 @@
 import { MyFunctionProvider } from './../../providers/my-function/my-function';
-import { Events } from 'ionic-angular';
-import { Component } from '@angular/core';
+import { Events, App } from 'ionic-angular';
+import { Component, ViewEncapsulation } from '@angular/core';
 import {animate, AUTO_STYLE, state, style, transition, trigger} from '@angular/animations';
 import { MenuItems } from './../../shared/menu-items/menu-items';
 
@@ -37,10 +37,11 @@ import { MenuItems } from './../../shared/menu-items/menu-items';
       ]),
       transition(':leave', [
         style({transform: 'translate(0)'}),
-        animate('400ms ease-in-out', style({opacity: 0}))
+        animate('400ms easein-out', style({opacity: 0}))
       ])
     ])
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class MySideMenuComponent {
 
@@ -80,13 +81,14 @@ export class MySideMenuComponent {
   constructor(
     public menuItems: MenuItems,
     public events: Events,
-    public myFunctionProvider: MyFunctionProvider
+    public myFunctionProvider: MyFunctionProvider,
+    public app: App
   ) {
     var myMenu = this.menuItems.getAll()
     this.myMenu = myMenu
     console.log("myMenu", myMenu)
 
-    this.myFunctionProvider.dbQuery("SELECT name FROM product_categories ORDER BY sequence", []).then((data: any) => {
+    this.myFunctionProvider.dbQuery("SELECT id, name FROM product_categories ORDER BY sequence", []).then((data: any) => {
       var cat = []
       for(var x in data){
         cat.push({badge: [{type: "warning", value: "100"}], state: data[x].name.toLowerCase().replace(/\s/gim, "_"), name: data[x].name, data: {item: "categories", id: data[x].id}})
@@ -177,7 +179,10 @@ export class MySideMenuComponent {
   clickFunction(item){
     console.log(item)
     if(item.data.item == "categories"){
+      this.myFunctionProvider.menuCtrl.close()
+      this.myFunctionProvider.nav.push("ProductCategoryPage", {id: item.data.id, name: item.name});
 
+      //this.myFunctionProvider.nav.push("ProductCategoryPage", {id: item.data.id, name: item.name})
     }
   }
 
