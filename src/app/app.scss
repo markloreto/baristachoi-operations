@@ -55,6 +55,19 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 3px #e4ae42;
 }
 
+.photo-buttons {
+  position: relative;
+  top: 10px;
+  right: 10px;
+  height: 0px;
+  text-align: right;
+  opacity: .3;
+}
+
+.my-success .toast-container {
+  background-color: #93be52
+}
+
 //fixes bootstrap to ionic
 .item-md .label{
     font-size: inherit !important;
