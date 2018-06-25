@@ -6,6 +6,9 @@ import { Events } from 'ionic-angular';
 import {DomSanitizer} from '@angular/platform-browser';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { ImageResizer, ImageResizerOptions } from '@ionic-native/image-resizer';
+import { ToastController } from 'ionic-angular';
+import { FileChooser } from '@ionic-native/file-chooser';
+import { File } from '@ionic-native/file';
 import moment from 'moment';
 import * as _ from 'lodash';
 /*
@@ -20,7 +23,7 @@ declare var window;
 @Injectable()
 export class MyFunctionProvider {
   db: any
-  ngrok: string = "https://c8fcef65.ngrok.io"
+  ngrok: string = "https://0e272920.ngrok.io"
   settings: any
   syncPullStep: number = 0
   syncPullTotalRecord: number = 0
@@ -33,7 +36,10 @@ export class MyFunctionProvider {
     public events: Events,
     private camera: Camera,
     public sanitizer: DomSanitizer,
-    private imageResizer: ImageResizer
+    private imageResizer: ImageResizer,
+    private toastCtrl: ToastController,
+    public fileChooser: FileChooser,
+    public file: File
   ) {
     console.log('Hello MyFunctionProvider Provider');
 
@@ -49,13 +55,13 @@ export class MyFunctionProvider {
         console.log("DB Initialized")
         this.db = db
 
-        this.dbQuery("DROP TABLE IF EXISTS sync_tables", [])
+        //this.dbQuery("DROP TABLE IF EXISTS products", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, name TEXT, data TEXT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS staffs (id INTEGER PRIMARY KEY, depot_id INT, name TEXT, photo TEXT, thumbnail TEXT, role_id INT, created_at TEXT, updated_at TEXT, sync INT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS roles (id INTEGER PRIMARY KEY, name TEXT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS product_categories (id INTEGER PRIMARY KEY, name TEXT, sequence INT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS measurement_units (id INTEGER PRIMARY KEY, name TEXT, abbr TEXT)", [])
-        this.dbQuery("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, photo TEXT, thumbnail TEXT, category INT, cost REAL, price REAL, author INT, measurement_unit INT, shareable INT, published INT, sku TEXT, sequence INT, sync INT)", [])
+        this.dbQuery("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, photo TEXT, thumbnail TEXT, category INT, cost REAL, price REAL, author INT, measurement_unit INT, shareable INT, sku TEXT, sequence INT, pack INT DEFAULT 1, sync INT)", [])
         //this.dbQuery("CREATE TABLE IF NOT EXISTS sync_tables (id INTEGER PRIMARY KEY, name TEXT, last_sync TEXT)", [])
 
         this.setSettings()
@@ -84,6 +90,12 @@ export class MyFunctionProvider {
     })
   }
 
+  getSettings(name){
+    return _.get(this.settings, name)
+  }
+
+  //DB
+
   dbQuery(q, v){
     return new Promise((resolve, reject) => {
       this.db.executeSql(q, v).then((data:any) => {
@@ -101,8 +113,6 @@ export class MyFunctionProvider {
       });
     });
   }
-
-  //DB
 
   dbQueryBatch(q){
     return new Promise((resolve, reject) => {
@@ -262,7 +272,7 @@ export class MyFunctionProvider {
 
   //Files
   fileInfo(path){
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       window.resolveLocalFileSystemURL(path, gotFile, fail);
 
       function fail(e) {
@@ -277,15 +287,15 @@ export class MyFunctionProvider {
     })
   }
 
-  getFileContentAsBase64(file){
+  getFileContentAsBase64(f){
     return new Promise((resolve, reject) => {
-      var reader = new FileReader();
-      reader.onloadend = function(e) {
-          var content = this.result;
-          resolve(content)
-      };
-      // The most important point, use the readAsDatURL Method from the file plugin
-      reader.readAsDataURL(file);
+        const reader = new FileReader();
+
+        reader.onload = () => {console.log("onload")}
+        reader.onerror = error => reject(error);
+        reader.onloadstart = () => {console.log("started")}
+        reader.onloadend = () => {resolve(reader.result); console.log("weee")}
+        reader.readAsDataURL(f);
     })
   }
 
@@ -293,6 +303,7 @@ export class MyFunctionProvider {
   takePicture(){
     return new Promise((resolve, reject) => {
       var self = this
+
       const options: CameraOptions = {
         quality: 100,
         destinationType: this.camera.DestinationType.FILE_URI,
@@ -303,25 +314,52 @@ export class MyFunctionProvider {
       }
 
       this.camera.getPicture(options).then((uri) => {
-        var img = new Image();
-        img.onload = function() {
-          // Convert image
-          self.fileInfo(uri).then((fileData) => {
-            self.getFileContentAsBase64(fileData).then((b64) => {
-              self.resizeImage(uri, img.width * 0.25, img.height * 0.25).then((thumbnailUri) => {
-                self.fileInfo(thumbnailUri).then((thumbnailFileData) => {
-                  self.getFileContentAsBase64(thumbnailFileData).then((thumbnailB64) => {
-                    resolve({photo: b64, thumbnail: thumbnailB64})
-                  })
+        self.spinner(true, "Processing Photo...")
+        console.log("Photo Process 1", uri)
+        this.imageProcess(uri).then((images: any) => {
+          self.spinner(false, "")
+          resolve(images)
+        })
+      }, (err) => {
+       // Handle error
+       self.spinner(false, "")
+      });
+    })
+  }
+
+  imageProperty(uri) {
+    return new Promise((resolve) => {
+      var img = new Image();
+      img.onload = function () {
+        resolve(img)
+      }
+      img.src = uri
+    })
+  }
+
+  imageProcess(uri) {
+    return new Promise((resolve) => {
+      let self = this
+
+      this.imageProperty(uri).then((img: any) => {
+        self.fileInfo(uri).then((fileData: any) => {
+          console.log("Photo Process 2", fileData)
+          self.getFileContentAsBase64(fileData).then((b64: any) => {
+            console.log("Photo Process 3", b64)
+            self.resizeImage(uri, img.width * 0.25, img.height * 0.25).then((thumbnailUri) => {
+              console.log("Photo Process 4", thumbnailUri)
+              self.fileInfo(thumbnailUri).then((thumbnailFileData) => {
+                console.log("Photo Process 5", thumbnailFileData)
+                self.getFileContentAsBase64(thumbnailFileData).then((thumbnailB64) => {
+                  console.log("Photo Process 6", thumbnailB64)
+                  resolve({ photo: b64, thumbnail: thumbnailB64 })
+
                 })
               })
             })
           })
-        }
-        img.src = uri
-      }, (err) => {
-       // Handle error
-      });
+        })
+      })
     })
   }
 
@@ -347,6 +385,23 @@ export class MyFunctionProvider {
 
   sanitize(base64){
     return this.sanitizer.bypassSecurityTrustUrl(base64);
+  }
+
+  //Notifications
+  presentToast(message, cssClass, duration = 3000, position = "bottom", showCloseButton = true) {
+    let toast = this.toastCtrl.create({
+      message: message,
+      duration: duration,
+      position: position,
+      showCloseButton: showCloseButton,
+      cssClass: cssClass
+    });
+
+    toast.onDidDismiss(() => {
+      console.log('Dismissed toast');
+    });
+
+    toast.present();
   }
 
 }
