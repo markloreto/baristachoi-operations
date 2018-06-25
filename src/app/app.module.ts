@@ -23,6 +23,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions';
 import { Camera } from '@ionic-native/camera';
 import { ImageResizer } from '@ionic-native/image-resizer';
 import { File } from '@ionic-native/file';
+import { FileChooser } from '@ionic-native/file-chooser';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import { File } from '@ionic-native/file';
     AndroidPermissions,
     Camera,
     ImageResizer,
-    File
+    File,
+    FileChooser
   ]
 })
 export class AppModule {}
