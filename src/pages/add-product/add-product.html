@@ -5,62 +5,95 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-    <my-header title="Add new product" headerColor="primary" [menuEnable]="true" ></my-header>
-    <ion-toolbar>
-      <ion-segment [(ngModel)]="segment">
-        <ion-segment-button value="details">
-          Details
-        </ion-segment-button>
-        <ion-segment-button value="photo">
-          Photo
-        </ion-segment-button>
-        <ion-segment-button value="options">
-          Options
-        </ion-segment-button>
-      </ion-segment>
-      <ion-buttons end>
-        <button ion-button icon-only color="tertiary" (click)="submit()">
-          <ion-icon name="send"></ion-icon>
-        </button>
-      </ion-buttons>
-    </ion-toolbar>
+  <my-header title="Add new product" headerColor="primary" [menuEnable]="true"></my-header>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="segment">
+      <ion-segment-button value="details">
+        Details
+      </ion-segment-button>
+      <ion-segment-button value="photo">
+        Photo
+      </ion-segment-button>
+      <ion-segment-button value="options">
+        Options
+      </ion-segment-button>
+    </ion-segment>
+    <ion-buttons end>
+      <button ion-button icon-only color="tertiary" (click)="submit()">
+        <ion-icon name="send"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 
 <ion-content padding>
   <div [ngSwitch]="segment">
-    <ion-list *ngSwitchCase="'details'">
-      <ion-item>
-        <ion-label>Name</ion-label>
-        <ion-input type="text" [(ngModel)]="name"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>SKU</ion-label>
-        <ion-input type="number" placeholder="Leave blank to auto generate" [(ngModel)]="sku"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>Cost</ion-label>
-        <ion-input type="number" [(ngModel)]="cost"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>Price</ion-label>
-        <ion-input type="number" [(ngModel)]="price"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>Category</ion-label>
-        <ion-select [(ngModel)]="category">
-          <ion-option *ngFor="let item of categories" value="{{item.id}}">{{item.name}}</ion-option>
-        </ion-select>
-      </ion-item>
-      <ion-item>
-        <ion-label>Measurement unit</ion-label>
-        <ion-select [(ngModel)]="measurement_unit">
-          <ion-option *ngFor="let item of measurement_units" value="{{item.id}}">{{item.name}}</ion-option>
-        </ion-select>
-      </ion-item>
-    </ion-list>
+    <form [formGroup]="myForm">
+      <ion-list *ngSwitchCase="'details'">
+        <ion-item [class.border-danger]="isValid('pName')">
+          <ion-label>Name</ion-label>
+          <ion-input type="text" formControlName="pName"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="isValid('pName')">
+          <p>Product name is required</p>
+        </ion-item>
+        <ion-item>
+          <ion-label>SKU</ion-label>
+          <ion-input type="number" placeholder="Leave blank to auto generate" formControlName="sku"></ion-input>
+        </ion-item>
+        <ion-item [class.border-danger]="isValid('cost')">
+          <ion-label>Cost</ion-label>
+          <ion-input type="tel" formControlName="cost"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="isValid('cost')">
+          <p>Cost is required</p>
+        </ion-item>
+        <ion-item [class.border-danger]="isValid('price')">
+          <ion-label>Price</ion-label>
+          <ion-input type="tel" formControlName="price"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="isValid('price')">
+          <p>Price is required</p>
+        </ion-item>
+        <ion-item [class.border-danger]="isValid('pack')">
+          <ion-label>Packaging</ion-label>
+          <ion-input type="tel" formControlName="pack" value="1"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="isValid('pack')">
+          <p>Packaging is required</p>
+        </ion-item>
+        <ion-item>
+          <ion-label>Category</ion-label>
+          <ion-select (ionChange)="catSelected()" formControlName="category">
+            <ion-option *ngFor="let item of categories" value="{{item.id}}">{{item.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item [class.border-danger]="isValid('measurement_unit')">
+          <ion-label>Measurement unit</ion-label>
+          <ion-select formControlName="measurement_unit">
+            <ion-option *ngFor="let item of measurement_units" value="{{item.id}}">{{item.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item *ngIf="isValid('measurement_unit')">
+          <p>Measurement unit is required</p>
+        </ion-item>
+      </ion-list>
+    </form>
     <ion-card *ngSwitchCase="'photo'">
-      <img [src]="image" alt="" class="img-fluid img-thumbnail" (click)="takePhoto()">
+      <div class="photo-buttons">
+        <div>
+          <button large ion-button color="light" icon-only round (click)="takePhoto()">
+            <ion-icon name="camera"></ion-icon>
+          </button>
+        </div>
+        <div>
+          <button large ion-button color="light" icon-only round (click)="uploadPhoto()">
+            <ion-icon name="image"></ion-icon>
+          </button>
+        </div>
+      </div>
+      <img [src]="image" alt="" class="img-fluid img-thumbnail">
     </ion-card>
     <ion-list *ngSwitchCase="'options'">
       <ion-item>
@@ -69,4 +102,5 @@
       </ion-item>
     </ion-list>
   </div>
+
 </ion-content>

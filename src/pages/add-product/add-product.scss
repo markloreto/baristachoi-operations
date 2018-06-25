@@ -1,3 +1,10 @@
 page-add-product {
+  .invalid {
+    border: 1px solid #ea6153;
+  }
 
+  p {
+    font-size: 0.8em;
+    color: #d2d2d2 !important;
+  }
 }
