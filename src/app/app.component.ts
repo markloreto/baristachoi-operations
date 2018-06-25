@@ -70,7 +70,7 @@ export class MyApp {
       this.platform.registerBackButtonAction(() => {
         console.log(this.nav.getActive().component.name)
         let nav = this.nav.getActive();
-
+        this.myFunctionProvider.spinner(false, "")
         if(nav != null){
 
           let activePortal = this.ionicApp._loadingPortal.getActive() ||
