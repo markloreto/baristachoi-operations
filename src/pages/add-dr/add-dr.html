@@ -1,0 +1,138 @@
+<!--
+  Generated template for the AddDrPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <my-header title="Add new DR" headerColor="primary" [menuEnable]="true"></my-header>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="segment">
+      <ion-segment-button value="details">
+        Details
+      </ion-segment-button>
+      <ion-segment-button value="items">
+        Items
+      </ion-segment-button>
+      <ion-segment-button value="photos">
+        Photos
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div [ngSwitch]="segment">
+    <form [formGroup]="myForm">
+      <ion-list *ngSwitchCase="'details'">
+        <ion-item>
+          <ion-label>Date</ion-label>
+          <ion-datetime displayFormat="MMMM DD, YYYY" pickerFormat="MMMM DD YYYY" formControlName="date"></ion-datetime>
+        </ion-item>
+        <ion-item [class.border-danger]="isValid('dr')">
+          <ion-label>DR #</ion-label>
+          <ion-input type="tel" formControlName="dr"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="isValid('dr')">
+          <p>DR # is required</p>
+        </ion-item>
+        <ion-item [class.border-danger]="isValid('dr')">
+          <ion-label>Note</ion-label>
+          <ion-textarea formControlName="note" name="note" autocomplete="on" autocorrect="on"></ion-textarea>
+        </ion-item>
+      </ion-list>
+    </form>
+    <div *ngSwitchCase="'items'">
+      <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable fullscreen" [scrollbarH]="true" [columnMode]="'standard'"
+        [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
+        (select)='onSelect($event)' [footerHeight]="50">
+
+        <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
+          <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
+            <div style="padding-left:5px;">
+              <b>{{group.key}}</b>
+            </div>
+          </ng-template>
+        </ngx-datatable-group-header>
+
+        <ngx-datatable-column name="Name" prop="name">
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <div style="display: contents">{{value}}</div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Quantity" prop="qty" >
+          <ng-template let-value="value" ngx-datatable-cell-template let-row="row">
+            {{value}} {{(value > 1) ? row["abbr"] + "s" : row["abbr"]}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Price" prop="price">
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            ₱ {{value | number:'.2-2'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Total" prop="total">
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            ₱ {{value | number:'.2-2'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-footer>
+          <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize" let-selectedCount="selectedCount"
+            let-curPage="curPage" let-offset="offset">
+            <div style="padding: 5px 10px; width: 100%; text-align: right; font-size: medium">
+              <div>
+                <strong>Grand Total</strong>: ₱ {{grandTotal | number:'.2-2'}}
+              </div>
+            </div>
+          </ng-template>
+        </ngx-datatable-footer>
+      </ngx-datatable>
+    </div>
+    <div *ngSwitchCase="'photos'">
+      <div class="alert alert-info background-info" *ngIf="!photos.length">
+        No Photo Attachment
+      </div>
+      <ion-row justify-content-center>
+        <ion-col *ngFor="let photo of photos; let i = index" col-auto text-center>
+          <div class="thumbnail">
+            <div class="thumb">
+              <div class="trash-container">
+                <button class="btn btn-danger btn-icon" (click)="trashPhoto(i)">
+                  <i class="icofont icofont-trash" style="margin-right: none !important"></i>
+                </button>
+              </div>
+              <img [src]="myFunctionProvider.sanitize(photo.b64_preview)" class="img-fluid img-thumbnail" (click)="myFunctionProvider.viewPhoto(photo.b64)">
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+
+  <ion-fab top right edge *ngIf="(segment === 'photos')">
+    <button ion-fab color="tertiary" mini>
+      <ion-icon name="add"></ion-icon>
+    </button>
+    <ion-fab-list>
+      <button ion-fab (click)="addFromCamera()">
+        <ion-icon name="camera"></ion-icon>
+      </button>
+      <button ion-fab (click)="addFromFile()">
+        <ion-icon name="image"></ion-icon>
+      </button>
+    </ion-fab-list>
+  </ion-fab>
+  <ion-fab top right edge *ngIf="(segment === 'items')">
+    <button ion-fab color="tertiary" mini (click)="addItem()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
+  <ion-fab right bottom>
+    <button ion-fab color="primary" (click)="submit()">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </ion-fab>
+</ion-content>

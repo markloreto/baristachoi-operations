@@ -1,0 +1,22 @@
+page-add-dr {
+  .trash-container{
+    height: 0px;
+    position: relative;
+    left: 3px;
+    float: left;
+    top: -15px;
+  }
+
+  .trash-container button.btn{
+    border: 2px solid map-get($colors, bg)
+  }
+
+  .img-thumbnail {
+    max-height: 14em !important
+  }
+
+  .datatable-body-cell-label{
+    display: contents !important
+  }
+
+}
