@@ -1,0 +1,30 @@
+<!--
+  Generated template for the ItemsModalPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <my-header title="Select Items" headerColor="primary" [menuEnable]="false"></my-header>
+</ion-header>
+
+
+<ion-content>
+  <ion-item-group>
+    <ng-container *ngFor="let category of categories">
+      <ion-item-divider color="light">{{category.category}}</ion-item-divider>
+      <ion-item *ngFor="let product of category.items">
+        <ion-label>{{product.product_name}}</ion-label>
+        <ion-checkbox [(ngModel)]="product.checked" (ionChange)="updateC()"></ion-checkbox>
+        <ion-thumbnail item-end>
+          <img [src]="product.product_thumbnail">
+        </ion-thumbnail>
+      </ion-item>
+    </ng-container>
+  </ion-item-group>
+  <ion-fab right bottom>
+    <button ion-fab color="primary" (click)="submit()">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </ion-fab>
+</ion-content>
