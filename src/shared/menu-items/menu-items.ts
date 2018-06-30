@@ -43,6 +43,13 @@ var MENUITEMS = [
         icon: 'ti-layout-grid2-alt',
         children: []
       },
+      {
+        state: 'DeliveryReceiptPage',
+        short_label: 'DR',
+        name: 'Delivery Receipt',
+        type: 'link',
+        icon: 'ti-truck'
+      },
     ]
   },
   {
