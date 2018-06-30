@@ -9,6 +9,7 @@ import { ImageResizer, ImageResizerOptions } from '@ionic-native/image-resizer';
 import { ToastController } from 'ionic-angular';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { File } from '@ionic-native/file';
+import { PhotoViewer } from '@ionic-native/photo-viewer';
 import moment from 'moment';
 import * as _ from 'lodash';
 /*
@@ -23,7 +24,7 @@ declare var window;
 @Injectable()
 export class MyFunctionProvider {
   db: any
-  ngrok: string = "https://0e272920.ngrok.io"
+  ngrok: string = "http://9211cde6.ngrok.io"
   settings: any
   syncPullStep: number = 0
   syncPullTotalRecord: number = 0
@@ -39,7 +40,8 @@ export class MyFunctionProvider {
     private imageResizer: ImageResizer,
     private toastCtrl: ToastController,
     public fileChooser: FileChooser,
-    public file: File
+    public file: File,
+    private photoViewer: PhotoViewer
   ) {
     console.log('Hello MyFunctionProvider Provider');
 
@@ -62,6 +64,8 @@ export class MyFunctionProvider {
         this.dbQuery("CREATE TABLE IF NOT EXISTS product_categories (id INTEGER PRIMARY KEY, name TEXT, sequence INT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS measurement_units (id INTEGER PRIMARY KEY, name TEXT, abbr TEXT)", [])
         this.dbQuery("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, photo TEXT, thumbnail TEXT, category INT, cost REAL, price REAL, author INT, measurement_unit INT, shareable INT, sku TEXT, sequence INT, pack INT DEFAULT 1, sync INT)", [])
+        this.dbQuery("CREATE TABLE IF NOT EXISTS modules (id INTEGER PRIMARY KEY, name TEXT)", [])
+        this.dbQuery("CREATE TABLE IF NOT EXISTS attachments (id INTEGER PRIMARY KEY, module_id INT, item_id INT, b64 TEXT, b64_preview TEXT, sync INT)", [])
         //this.dbQuery("CREATE TABLE IF NOT EXISTS sync_tables (id INTEGER PRIMARY KEY, name TEXT, last_sync TEXT)", [])
 
         this.setSettings()
@@ -385,6 +389,10 @@ export class MyFunctionProvider {
 
   sanitize(base64){
     return this.sanitizer.bypassSecurityTrustUrl(base64);
+  }
+
+  viewPhoto(photo){
+    this.photoViewer.show(photo)
   }
 
   //Notifications
