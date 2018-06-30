@@ -24,6 +24,7 @@ import { Camera } from '@ionic-native/camera';
 import { ImageResizer } from '@ionic-native/image-resizer';
 import { File } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
+import { PhotoViewer } from '@ionic-native/photo-viewer';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { FileChooser } from '@ionic-native/file-chooser';
     Camera,
     ImageResizer,
     File,
-    FileChooser
+    FileChooser,
+    PhotoViewer
   ]
 })
 export class AppModule {}
