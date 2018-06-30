@@ -18,11 +18,6 @@
         Options
       </ion-segment-button>
     </ion-segment>
-    <ion-buttons end>
-      <button ion-button icon-only color="tertiary" (click)="submit()">
-        <ion-icon name="send"></ion-icon>
-      </button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -102,5 +97,9 @@
       </ion-item>
     </ion-list>
   </div>
-
+  <ion-fab right bottom>
+    <button ion-fab color="primary" (click)="submit()">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-content>
