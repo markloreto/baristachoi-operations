@@ -24,7 +24,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-menu{
-    background-color: #fff !important
+    background-color: map-get($colors, bg) !important
 }
 
 .btn-amber {
