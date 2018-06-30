@@ -94,4 +94,6 @@
     <plugin name="info.protonet.imageresizer" spec="^0.1.1" />
     <plugin name="cordova-plugin-file" spec="^6.0.1" />
     <plugin name="cordova-plugin-filechooser" spec="^1.0.1" />
+    <plugin name="cordova-plugin-screen-orientation" spec="^3.0.1" />
+    <plugin name="com-sarriaroman-photoviewer" spec="^1.1.18" />
 </widget>
