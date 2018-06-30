@@ -9,8 +9,18 @@
 </ion-header>
 
 
-<ion-content padding>
-    <ion-fab top right edge>
-      <button ion-fab mini color="secondary" (click)="pushAddProduct()"><ion-icon name="add"></ion-icon></button>
-    </ion-fab>
+<ion-content>
+  <ion-item *ngFor="let product of products">
+    <ion-thumbnail item-start>
+      <img [src]="product.product_thumbnail">
+    </ion-thumbnail>
+    <h2>{{product.product_name}}</h2>
+    <p>Hayao Miyazaki • 1988</p>
+    <button ion-button clear item-end>View</button>
+  </ion-item>
+  <ion-fab top right edge>
+    <button ion-fab mini color="secondary" (click)="pushAddProduct()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-content>

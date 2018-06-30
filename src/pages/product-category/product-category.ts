@@ -17,6 +17,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 export class ProductCategoryPage {
   id: any
   title: string
+  products: any = []
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public myFunctionProvider: MyFunctionProvider
@@ -24,7 +25,19 @@ export class ProductCategoryPage {
     this.id = navParams.get("id")
     this.title = navParams.get("name")
 
+    this.loadIt()
+  }
 
+  loadIt(){
+    this.products = []
+    this.myFunctionProvider.dbQuery("SELECT p.id AS product_id, p.thumbnail AS product_thumbnail, p.name AS product_name, pc.name AS category_name FROM products p INNER JOIN product_categories pc ON p.category = pc.id WHERE p.category = ?", [this.id]).then((p: any) => {
+      console.log(p)
+      for(var x in p){
+        p[x].product_thumbnail = (p[x].product_thumbnail) ? this.myFunctionProvider.sanitize(p[x].product_thumbnail) : "assets/images/bc5.jpg"
+        this.products.push(p[x])
+      }
+      console.log(this.products)
+    })
   }
 
   ionViewDidLoad() {
