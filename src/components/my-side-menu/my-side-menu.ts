@@ -91,7 +91,7 @@ export class MySideMenuComponent {
     this.myFunctionProvider.dbQuery("SELECT id, name FROM product_categories ORDER BY sequence", []).then((data: any) => {
       var cat = []
       for(var x in data){
-        cat.push({badge: [{type: "warning", value: "100"}], state: data[x].name.toLowerCase().replace(/\s/gim, "_"), name: data[x].name, data: {item: "categories", id: data[x].id}})
+        cat.push({badge: [{type: "warning", value: "100"}], state: "ProductCategoryPage", name: data[x].name, data: {name: data[x].name, id: data[x].id}})
       }
       console.log("Categories", cat)
       this.myMenu[0].main[0].children = cat
@@ -178,11 +178,12 @@ export class MySideMenuComponent {
 
   clickFunction(item){
     console.log(item)
-    if(item.data.item == "categories"){
+    if (typeof item.data !== "undefined") {
       this.myFunctionProvider.menuCtrl.close()
-      this.myFunctionProvider.nav.push("ProductCategoryPage", {id: item.data.id, name: item.name});
-
-      //this.myFunctionProvider.nav.push("ProductCategoryPage", {id: item.data.id, name: item.name})
+      this.myFunctionProvider.nav.push("ProductCategoryPage", item.data);
+    }else{
+      this.myFunctionProvider.menuCtrl.close()
+      this.myFunctionProvider.nav.push(item.state, (typeof item.data !== "undefined") ? item.data : {})
     }
   }
 
