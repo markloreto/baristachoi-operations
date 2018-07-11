@@ -3,6 +3,7 @@ import { IonicPageModule } from 'ionic-angular';
 import { DeliveryReceiptPage } from './delivery-receipt';
 import { MyHeaderComponentModule } from '../../components/my-header/my-header.module';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 @NgModule({
   declarations: [
@@ -10,7 +11,8 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
   ],
   imports: [
     IonicPageModule.forChild(DeliveryReceiptPage),
-    MyHeaderComponentModule
+    MyHeaderComponentModule,
+    NgxDatatableModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [ScreenOrientation]

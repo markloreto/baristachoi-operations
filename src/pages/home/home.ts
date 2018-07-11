@@ -24,7 +24,8 @@ export class HomePage {
     public myFunctionProvider: MyFunctionProvider
   ) {
     this.text = 'Hello World';
-    this.myFunctionProvider.syncPull(["product_categories", "measurement_units"], false)
+    this.myFunctionProvider.syncPull(["products","product_categories", "measurement_units", "attachments", "delivery_receipts", "inventories", "modules"], true)
+    //this.myFunctionProvider.syncPush(["products", "delivery_receipts", "inventories", "attachments"], false)
   }
 
   ngOnInit() {

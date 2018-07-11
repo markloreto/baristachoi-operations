@@ -96,7 +96,7 @@ export class AddProductPage {
 
     console.log(this.myForm)
     this.myFunctionProvider.spinner(true, "Please wait")
-    this.myFunctionProvider.dbQuery("INSERT OR REPLACE INTO products (id, name, photo, thumbnail, category, cost, price, author, measurement_unit, shareable, sku, sequence, pack, sync) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [this.myFunctionProvider.getTimestamp(), fc.pName.value, this.photo, this.thumbnail, fc.category.value, fc.cost.value, fc.price.value, this.myFunctionProvider.getSettings("logged_staff"), fc.measurement_unit.value, (this.shared) ? 1 : 0, genSKU, 0, parseInt(fc.pack.value), 0]).then(() => {
+    this.myFunctionProvider.dbQuery("INSERT OR REPLACE INTO products (id, name, photo, thumbnail, category, cost, price, author, measurement_unit, shareable, sku, sequence, pack, sync) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [this.myFunctionProvider.getTimestamp(), fc.pName.value, this.photo, this.thumbnail, fc.category.value, fc.cost.value, fc.price.value, this.myFunctionProvider.getSettings("logged_staff"), fc.measurement_unit.value, (this.shared) ? null : this.myFunctionProvider.settings.depot.id, genSKU, 0, parseInt(fc.pack.value), null]).then(() => {
       this.myFunctionProvider.presentToast("New product saved", "my-success")
       this.myFunctionProvider.spinner(false, "")
       this.navCtrl.pop()

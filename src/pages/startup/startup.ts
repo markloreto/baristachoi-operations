@@ -196,7 +196,8 @@ export class StartupPage {
             ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [2, "depot", JSON.stringify({name: this.selectedDepotName, id: this.selectedDepot})]],
             ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [3, "passcode", this.passcode]],
             ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [4, "logged_staff", null]],
-            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [5, "accountable_staff", this.passcode]]
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [5, "accountable_staff", this.passcode]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [6, "last_push_sync", 0]]
           ]).then(() => {
 
             this.myFunctionProvider.setSettings()

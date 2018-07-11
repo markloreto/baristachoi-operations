@@ -2,6 +2,8 @@ import { MyFunctionProvider } from './../../providers/my-function/my-function';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { ActionSheetController } from 'ionic-angular';
+import moment from 'moment'
 
 /**
  * Generated class for the DeliveryReceiptPage page.
@@ -16,14 +18,113 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
   templateUrl: 'delivery-receipt.html',
 })
 export class DeliveryReceiptPage {
-  testData: any = [1, 2, 3, 4]
+  rows: any = [];
+  columns: any = [
+    { prop: 'date', name: 'Date', minWidth: 130, width: 130 },
+    { prop: 'dr', name: 'DR #', minWidth: 60, width: 60  },
+    { prop: 'numKilos', name: 'No. of Kilos', minWidth: 90, width: 90  },
+    { prop: 'amount', name: 'Amount', minWidth: 100, width: 100  },
+    { prop: 'status', name: 'Status', minWidth: 90, width: 80  }
+  ];
+  selected: any = []
+  page: any = {
+    count: 0,
+    offset: 0,
+    limit: 5
+  }
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     private screenOrientation: ScreenOrientation,
-    private myFunctionProvider: MyFunctionProvider
+    private myFunctionProvider: MyFunctionProvider,
+    public actionSheetCtrl: ActionSheetController
   ) {
     //this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.LANDSCAPE);
+
+    this.myFunctionProvider.dbQuery("SELECT * FROM inventories", []).then((q: any) => {
+      console.log("inv", q)
+    })
+
+    this.myFunctionProvider.dbQuery("SELECT * FROM attachments", []).then((q: any) => {
+      console.log("attachments", q)
+    })
+
+  }
+
+  loadIt(pageInfo){
+    console.log("Page Info", pageInfo)
+    this.rows = []
+    this.myFunctionProvider.spinner(true, "Please wait")
+    this.myFunctionProvider.dbQuery("SELECT COUNT(*) AS num FROM delivery_receipts", []).then((data: any) => {
+      this.page.count = data[0].num
+      console.log("Total DRS:", data[0].num)
+      this.page.offset = pageInfo.offset;
+
+      this.myFunctionProvider.dbQuery("SELECT myDr.*, ifnull((SELECT SUM(inv.qty) FROM inventories inv JOIN products p ON inv.product_id = p.id WHERE reference_id = myDr.id AND p.category = 1 AND inv.type = 1), 0) AS numKilos, (SELECT SUM(qty * cost) FROM inventories WHERE reference_id = myDr.id) AS amount FROM delivery_receipts myDr ORDER BY myDr.dr DESC LIMIT 5 OFFSET " + (pageInfo.offset * this.page.limit), []).then((drs: any) => {
+        var array = []
+        console.log("Drs", drs)
+        for(var x in drs){
+          array.push({id: drs[x].id, date: moment(drs[x].created_date.replace(" 00:00:00", ""), "YYYY-MM-DD").format("LL"), dr: drs[x].dr, numKilos: drs[x].numKilos + ((drs[x].numKilos) ? " Kgs" : " kg"), amount: "₱ " + drs[x].amount.toLocaleString(), status: "Pending"})
+        }
+        this.rows = array
+        this.myFunctionProvider.spinner(false, "")
+      })
+    })
+
+  }
+
+  presentActionSheet(s) {
+    console.log("Selected", this.selected)
+    const actionSheet = this.actionSheetCtrl.create({
+      title: 'What to do with DR # ' + s.dr,
+      buttons: [
+        {
+          text: 'Archive',
+          handler: () => {
+            console.log('Archive clicked');
+          }
+        },{
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => {
+            this.myFunctionProvider.toastConfirm("DR # " + s.dr, "Delete?", "fa fa-trash").then((b: any) => {
+              if(b){
+                //todo
+                this.myFunctionProvider.spinner(true, "Removing from database")
+                var array = []
+                array.push({table: "delivery_receipts", id: s.id})
+                this.myFunctionProvider.dbQuery("SELECT id, sync FROM attachments WHERE module_id = 1 AND reference_id = ?", [s.id]).then((attachmentIds: any) => {
+                  for(var x in attachmentIds){
+                    array.push({table: "attachments", id: attachmentIds[x].id, sync: attachmentIds[x].sync})
+                  }
+                  this.myFunctionProvider.dbQuery("SELECT id, sync FROM inventories WHERE reference_id = ? AND module_id = 1", [s.id]).then((invIds: any)=> {
+                    for(var x in invIds){
+                      array.push({table: "inventories", id: invIds[x].id, sync: invIds[x].sync})
+                    }
+
+                    this.myFunctionProvider.deleteSync(array).then(() => {
+                      this.myFunctionProvider.spinner(false, "")
+                      this.loadIt({offset: this.page.offset})
+                    })
+                  })
+                })
+              }
+            })
+          }
+        },{
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
+
+  ionViewWillEnter(){
+    this.loadIt({ offset: 0 })
   }
 
   ionViewDidLoad() {
@@ -32,6 +133,20 @@ export class DeliveryReceiptPage {
 
   ionViewWillLeave() {
     this.screenOrientation.unlock();
+  }
+
+  onActivate(event) {
+    //console.log('Activate Event', event);
+  }
+
+  onSelect({ selected }) {
+    console.log('Select Event', selected, this.selected);
+    console.log("Selected", this.selected)
+    //this.selected = []
+    var s = selected[0]
+    this.presentActionSheet(s)
+
+
   }
 
   add(){

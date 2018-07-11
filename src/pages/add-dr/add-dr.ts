@@ -1,11 +1,11 @@
-import { MyFunctionProvider } from './../../providers/my-function/my-function';
+import { IziToastSettings, default as iziToast } from 'izitoast';
 import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MyFunctionProvider } from './../../providers/my-function/my-function';
 
 import moment from 'moment'
 import _ from 'lodash'
-import swal from 'sweetalert2';
 
 /**
  * Generated class for the AddDrPage page.
@@ -26,6 +26,7 @@ export class AddDrPage {
   submitAttempt: boolean = false;
   photos: any = []
   products: any = []
+  searchProducts: any = []
   grandTotal: number = 0
 
   selected: any = []
@@ -34,17 +35,20 @@ export class AddDrPage {
   columns: any = [
     { prop: 'name', name: 'Name' },
     { prop: 'qty', name: 'Quantity' },
-    { prop: 'price', name: 'Price' },
-    { prop: 'total', name: 'Total' }
+    { prop: 'cost', name: 'Price' },
+    { prop: 'total', name: 'Total' },
+    { prop: 'thumbnail', name: 'Thumbnail' }
   ];
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     public myFunctionProvider: MyFunctionProvider,
     public formBuilder: FormBuilder,
-    public modalCtrl: ModalController
+    public modalCtrl: ModalController,
   ) {
-    this.myFunctionProvider.dbQuery("SELECT p.id AS product_id, p.cost AS product_price, p.sku AS product_sku, p.thumbnail AS product_thumbnail, p.name AS product_name, pc.name AS category_name, mu.abbr AS abbr FROM products p INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id", []).then((products: any) => {
+
+
+    this.myFunctionProvider.dbQuery("SELECT p.id AS product_id, p.cost AS product_cost, p.price AS product_price, p.sku AS product_sku, p.thumbnail AS product_thumbnail, p.name AS product_name, pc.name AS category_name, mu.abbr AS abbr FROM products p INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id", []).then((products: any) => {
       var grouped = _.chain(products)
         .groupBy('category_name')
         .map((items, category) => ({ items, category }))
@@ -59,12 +63,13 @@ export class AddDrPage {
       }
 
       this.products = grouped
+      this.searchProducts = grouped
       console.log("Products", grouped)
     })
     this.myForm = formBuilder.group({
       date: [moment().format("YYYY-MM-DD"), Validators.required],
       dr: ['', Validators.required],
-      note: [""]
+      notes: [""]
     });
   }
 
@@ -96,7 +101,7 @@ export class AddDrPage {
   }
 
   addItem() {
-    let m = this.modalCtrl.create("ItemsModalPage", { products: this.products });
+    let m = this.modalCtrl.create("ItemsModalPage", { products: this.searchProducts });
     m.onDidDismiss(data => {
       this.products = data
       //this.rows = []
@@ -106,23 +111,25 @@ export class AddDrPage {
       for (var x in this.products) {
         for (var y in this.products[x].items) {
           l = this.products[x].items
-          if (l[y].checked){
+          if (l[y].checked) {
             newCheckItems.push({
               id: l[y].product_id,
               name: l[y].product_name,
               category: l[y].category_name,
               qty: l[y].qty,
+              cost: l[y].product_cost,
               price: l[y].product_price,
               total: 0,
-              abbr: l[y].abbr
+              abbr: l[y].abbr,
+              thumbnail: l[y].product_thumbnail
             })
           }
         }
       }
 
-      for(var x in this.rows){
-        for(var y in newCheckItems){
-          if(this.rows[x].id == newCheckItems[y].id){
+      for (var x in this.rows) {
+        for (var y in newCheckItems) {
+          if (this.rows[x].id == newCheckItems[y].id) {
             newCheckItems[y].qty = this.rows[x].qty
             newCheckItems[y].total = this.rows[x].total
             this.grandTotal += this.rows[x].total
@@ -151,34 +158,59 @@ export class AddDrPage {
     //this.selected = []
     var s = selected[0]
 
-    swal({
-      title: 'Quantity for ' + s.name,
-      input: 'tel',
-      inputValue: (s.qty) ? s.qty : "",
-      inputPlaceholder: 'Input Quantity',
-      showCancelButton: true,
-    }).then(qty => {
-      qty = parseInt(qty)
-      if (!Number.isInteger(qty)) {
-        swal({
-          type: 'error',
-          title: 'Wrong Input',
-          text: 'Please input valid quantity only'
-        })
-      } else {
-        var l
-        this.grandTotal = 0
-        for (var x in this.rows) {
-          if(s.id == this.rows[x].id){
-            this.rows[x].qty = qty
-            this.rows[x].total = qty * this.rows[x].price
+    let hide: IziToastSettings = {
+      message: "",
+      transitionOut: 'fadeOutUp',
+      onClosing: (instance, toast, closedBy) => {
+        var qty = parseInt(toast.querySelector("input").value)
+        console.log("Qty", qty)
+
+        if (!Number.isInteger(qty)) {
+          iziToast.error({
+            title: 'Wrong Input',
+            message: 'Please input valid quantity only',
+          });
+        } else {
+          this.grandTotal = 0
+          for (var x in this.rows) {
+            if (s.id == this.rows[x].id) {
+              this.rows[x].qty = qty
+              this.rows[x].total = qty * this.rows[x].cost
+            }
+            this.grandTotal += this.rows[x].total
           }
-          this.grandTotal += this.rows[x].total
+          console.log(this.rows)
+          this.rows = [...this.rows]
         }
-        console.log(this.rows)
-        this.rows = [...this.rows]
       }
-    })
+    }
+
+    let options: IziToastSettings = {
+      image: (s.thumbnail) ? s.thumbnail : "assets/images/bc5.jpg",
+      timeout: 0,
+      close: true,
+      overlay: true,
+      toastOnce: true,
+      id: 'quantity',
+      title: s.name + "'s",
+      message: 'quantity',
+      position: 'center',
+      inputs: [
+        ['<input type="tel" value="' + ((s.qty) ? s.qty : 0) + '" placeholder="Input Quantity">', (instance, toast, input, e) => {
+          console.info(input.nodeValue);
+        }, true]
+      ],
+      buttons: [
+        ['<button>Clear</button>', function (instance, toast) {
+          toast.querySelector("input").value = "0"
+        }, false],
+        ['<button>Ok</button>', function (instance, toast) {
+          instance.hide(hide, toast, "buttonName")
+        }, false]
+      ]
+    }
+
+    iziToast.question(options);
   }
 
   onActivate(event) {
@@ -186,8 +218,72 @@ export class AddDrPage {
   }
 
   submit() {
+    this.submitAttempt = true
     let fc = this.myForm.controls
     console.log(fc.date.value)
+    if (!this.myForm.valid)
+      return
+
+    if (!this.rows.length) {
+      this.segment = "items"
+      iziToast.warning({
+        title: 'Import items',
+        message: 'List of items are empty',
+      });
+      return
+    }
+
+    for (var x in this.rows) {
+      if (!this.rows[x].qty) {
+        this.segment = "items"
+        iziToast.warning({
+          title: 'Oppps!',
+          message: 'Please set the quantity for ' + this.rows[x].name,
+        });
+        return
+      }
+    }
+
+    var t = this.myFunctionProvider.getTimestamp()
+    var k = parseInt(this.myFunctionProvider.getTimestamp())
+    var arr = []
+    console.log(this.rows)
+
+    this.myFunctionProvider.dbColValExist("delivery_receipts", "dr", fc.dr.value).then((val: any) => {
+      if (val) {
+        iziToast.warning({
+          title: 'DR # ' + fc.dr.value,
+          message: 'Already exist',
+        });
+      }
+      else {
+        this.myFunctionProvider.spinner(true, "Please wait")
+        this.myFunctionProvider.dbQuery("INSERT OR REPLACE INTO delivery_receipts (id, dr, created_date, notes, sync, staff_id) VALUES (?, ?, ?, ?, ?, ?)", [t, fc.dr.value, fc.date.value + " 00:00:00", fc.notes.value, null, parseInt(this.myFunctionProvider.settings.logged_staff)]).then(() => {
+          for (var x in this.rows) {
+            if (this.rows[x].qty) {
+              arr.push(["INSERT OR REPLACE INTO inventories (id, product_id, qty, price, cost, module_id, reference_id, type, sync, staff_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [k, this.rows[x].id, this.rows[x].qty, this.rows[x].price, this.rows[x].cost, 1, t, 1, null, parseInt(this.myFunctionProvider.settings.logged_staff)]])
+              k++
+            }
+          }
+
+          var s = parseInt(this.myFunctionProvider.getTimestamp())
+          var arr2 = []
+
+          this.myFunctionProvider.dbQueryBatch(arr).then(() => {
+            for (var x in this.photos) {
+              arr2.push(["INSERT OR REPLACE INTO attachments VALUES (?, ?, ?, ?, ?, ?, ?)", [s, parseInt(this.myFunctionProvider.settings.logged_staff), 1, t, this.photos[x].b64, this.photos[x].b64_preview, null]])
+              s++
+            }
+
+            this.myFunctionProvider.dbQueryBatch(arr2).then(() => {
+              this.myFunctionProvider.spinner(false, "Please wait")
+              this.navCtrl.pop()
+            })
+
+          })
+        })
+      }
+    })
   }
 
 }

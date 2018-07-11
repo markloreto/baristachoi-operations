@@ -27,9 +27,17 @@ h1, h2, h3, h4, h5, h6 {
     background-color: map-get($colors, bg) !important
 }
 
+.content-md{
+  background-color: map-get($colors, primary) !important
+}
+
+.card-md {
+  border-radius: 10px
+}
+
 .btn-amber {
-    background-color: #ffb012;
-    border-color: #ffb012;
+    background-color: map-get($colors, primary);
+    border-color: map-get($colors, primary);;
     color: #fff;
     cursor: pointer;
     transition: all .3s ease-in;
@@ -50,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .swal2-modal .swal2-file:focus, .swal2-modal .swal2-input:focus, .swal2-modal .swal2-textarea:focus {
   outline: 0;
-  border: 1px solid #ffb012;
+  border: 1px solid map-get($colors, primary);;
   -webkit-box-shadow: 0 0 3px #e4ae42;
   box-shadow: 0 0 3px #e4ae42;
 }
@@ -81,4 +89,13 @@ h1, h2, h3, h4, h5, h6 {
 
 button:focus{
     outline: none !important
+}
+
+.mb5em {margin-bottom: 5em}
+
+.myItems {border-bottom: 1px dashed map-get($colors, primary);}
+
+//datatable
+.datatable-row-wrapper:not(:first-child){
+  margin-top: 1em
 }

@@ -6,7 +6,7 @@
 -->
 <ion-header>
   <my-header title="Add new DR" headerColor="primary" [menuEnable]="true"></my-header>
-  <ion-toolbar>
+  <ion-toolbar color="secondary">
     <ion-segment [(ngModel)]="segment">
       <ion-segment-button value="details">
         Details
@@ -22,80 +22,107 @@
 </ion-header>
 
 <ion-content>
-  <div [ngSwitch]="segment">
-    <form [formGroup]="myForm">
-      <ion-list *ngSwitchCase="'details'">
-        <ion-item>
-          <ion-label>Date</ion-label>
-          <ion-datetime displayFormat="MMMM DD, YYYY" pickerFormat="MMMM DD YYYY" formControlName="date"></ion-datetime>
+
+  <div [ngSwitch]="segment" class="mb5em">
+    <form [formGroup]="myForm" *ngSwitchCase="'details'">
+      <ion-card>
+        <ion-list >
+          <ion-item class="myItems">
+            <ion-label>Date</ion-label>
+            <ion-datetime displayFormat="MMMM DD, YYYY" pickerFormat="MMMM DD YYYY" formControlName="date"></ion-datetime>
+          </ion-item>
+          <ion-item [class.border-danger]="isValid('dr')">
+            <ion-label>DR #</ion-label>
+            <ion-input type="tel" formControlName="dr"></ion-input>
+          </ion-item>
+          <ion-item *ngIf="isValid('dr')" class="myItems">
+            <p>DR # is required</p>
+          </ion-item>
+
+        </ion-list>
+
+      </ion-card>
+      <ion-card>
+
+        <ion-item [class.border-danger]="isValid('notes')" class="myItems">
+          <ion-textarea formControlName="notes" name="notes" autocomplete="on" autocorrect="on" placeholder="Notes"></ion-textarea>
         </ion-item>
-        <ion-item [class.border-danger]="isValid('dr')">
-          <ion-label>DR #</ion-label>
-          <ion-input type="tel" formControlName="dr"></ion-input>
-        </ion-item>
-        <ion-item *ngIf="isValid('dr')">
-          <p>DR # is required</p>
-        </ion-item>
-        <ion-item [class.border-danger]="isValid('dr')">
-          <ion-label>Note</ion-label>
-          <ion-textarea formControlName="note" name="note" autocomplete="on" autocorrect="on"></ion-textarea>
-        </ion-item>
-      </ion-list>
+      </ion-card>
     </form>
     <div *ngSwitchCase="'items'">
-      <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable fullscreen" [scrollbarH]="true" [columnMode]="'standard'"
-        [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
-        (select)='onSelect($event)' [footerHeight]="50">
+      <ion-card>
+        <ion-fab top right *ngIf="(segment === 'items')">
+          <button ion-fab color="tertiary" mini (click)="addItem()">
+            <ion-icon name="list-box"></ion-icon>
+          </button>
+        </ion-fab>
+        <ion-item>
+          <h2>DR# {{(myForm.controls["dr"].value) ? myForm.controls["dr"].value : "[Unknown]"}}</h2>
+          <p>{{myForm.controls["date"].value}}</p>
+        </ion-item>
+        <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable fullscreen" [scrollbarH]="true" [columnMode]="'standard'"
+          [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
+          (select)='onSelect($event)' [footerHeight]="50" [rowHeight]="58">
 
-        <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
-          <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
-            <div style="padding-left:5px;">
-              <b>{{group.key}}</b>
-            </div>
-          </ng-template>
-        </ngx-datatable-group-header>
-
-        <ngx-datatable-column name="Name" prop="name">
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <div style="display: contents">{{value}}</div>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="Quantity" prop="qty" >
-          <ng-template let-value="value" ngx-datatable-cell-template let-row="row">
-            {{value}} {{(value > 1) ? row["abbr"] + "s" : row["abbr"]}}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="Price" prop="price">
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            ₱ {{value | number:'.2-2'}}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="Total" prop="total">
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            ₱ {{value | number:'.2-2'}}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-footer>
-          <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize" let-selectedCount="selectedCount"
-            let-curPage="curPage" let-offset="offset">
-            <div style="padding: 5px 10px; width: 100%; text-align: right; font-size: medium">
-              <div>
-                <strong>Grand Total</strong>: ₱ {{grandTotal | number:'.2-2'}}
+          <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
+            <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
+              <div style="padding-left:5px;">
+                <b>{{group.key}}</b>
               </div>
-            </div>
-          </ng-template>
-        </ngx-datatable-footer>
-      </ngx-datatable>
+            </ng-template>
+          </ngx-datatable-group-header>
+
+          <ngx-datatable-column name="" prop="thumbnail" [width]="64" [minWidth]="64">
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              <div style="display: contents">
+                <img class="img-40 img-radius" [src]="(value) ? myFunctionProvider.sanitize(value) : 'assets/images/bc5.jpg'" alt="User-Profile-Image">
+              </div>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="Name" prop="name" cellClass="pad-top-18px" [width]="300" [minWidth]="160">
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              <div style="display: contents">{{value}}</div>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="Quantity" prop="qty" cellClass="pad-top-18px">
+            <ng-template let-value="value" ngx-datatable-cell-template let-row="row">
+              {{value}} {{(value > 1) ? row["abbr"] + "s" : row["abbr"]}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="Price" prop="cost" cellClass="pad-top-18px">
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              ₱ {{value | number:'.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="Total" prop="total" cellClass="pad-top-18px">
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              ₱ {{value | number:'.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-footer>
+            <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize" let-selectedCount="selectedCount"
+              let-curPage="curPage" let-offset="offset">
+              <div style="padding: 5px 10px; width: 100%; text-align: right; font-size: medium">
+                <div>
+                  <strong>Grand Total</strong>: ₱ {{grandTotal | number:'.2-2'}}
+                </div>
+              </div>
+            </ng-template>
+          </ngx-datatable-footer>
+        </ngx-datatable>
+      </ion-card>
+
     </div>
     <div *ngSwitchCase="'photos'">
       <div class="alert alert-info background-info" *ngIf="!photos.length">
         No Photo Attachment
       </div>
-      <ion-row justify-content-center>
+      <ion-row justify-content-center style="margin-top: 20px">
         <ion-col *ngFor="let photo of photos; let i = index" col-auto text-center>
           <div class="thumbnail">
             <div class="thumb">
@@ -125,11 +152,7 @@
       </button>
     </ion-fab-list>
   </ion-fab>
-  <ion-fab top right edge *ngIf="(segment === 'items')">
-    <button ion-fab color="tertiary" mini (click)="addItem()">
-      <ion-icon name="add"></ion-icon>
-    </button>
-  </ion-fab>
+
   <ion-fab right bottom>
     <button ion-fab color="primary" (click)="submit()">
       <ion-icon name="send"></ion-icon>

@@ -9,10 +9,18 @@
 </ion-header>
 
 
-<ion-content padding>
-    <ion-fab top right edge>
-        <button ion-fab mini color="secondary" (click)="add()">
-          <ion-icon name="add"></ion-icon>
-        </button>
-      </ion-fab>
+<ion-content>
+  <ion-card>
+    <ngx-datatable #myTable (page)='loadIt($event)' [count]="page.count" [offset]="page.offset" [externalPaging]="true" [limit]="page.limit" [rows]="rows" [columns]="columns" class="material fullscreen" [scrollbarH]="true" [columnMode]="'standard'"
+      [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
+      (select)='onSelect($event)' [footerHeight]="50">
+
+    </ngx-datatable>
+
+  </ion-card>
+  <ion-fab top right edge>
+    <button ion-fab mini color="secondary" (click)="add()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-content>
