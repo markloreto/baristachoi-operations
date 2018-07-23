@@ -86,9 +86,9 @@ export class AddProductPage {
     if(!this.myForm.valid)
       return
     let fc = this.myForm.controls
-    var genSKU = fc.sku.value
+    let genSKU = fc.sku.value
     if(fc.sku.value == ""){
-      var l3 = this.catName.slice(0, 3).toUpperCase()
+      let l3 = this.catName.slice(0, 3).toUpperCase()
       console.log(l3)
       genSKU = l3 + moment().format("x")
       console.log(genSKU)

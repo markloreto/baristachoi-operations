@@ -53,6 +53,30 @@ var MENUITEMS = [
     ]
   },
   {
+    label: "Releasing",
+    main: [
+      {
+        state: 'DisrListPage',
+        short_label: 'DLP',
+        name: 'DISR',
+        type: 'link',
+        icon: 'ti-agenda'
+      },
+    ]
+  },
+  {
+    label: "Tools",
+    main: [
+      {
+        state: 'SyncPage',
+        short_label: 'SP',
+        name: 'Synchronize',
+        type: 'link',
+        icon: 'ti-cloud'
+      },
+    ]
+  },
+  {
     label: 'Navigation',
     main: [
       {

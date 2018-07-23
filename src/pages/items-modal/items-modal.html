@@ -18,7 +18,7 @@
       <ion-item-divider color="light">{{category.category}}</ion-item-divider>
       <ion-item *ngFor="let product of category.items">
         <ion-label>{{product.product_name}}</ion-label>
-        <ion-checkbox [(ngModel)]="product.checked" (ionChange)="updateC()"></ion-checkbox>
+        <ion-checkbox [(ngModel)]="product.checked" (ionChange)="updateC()" [disabled]="product.disabled" [checked]="product.checked"></ion-checkbox>
         <ion-thumbnail item-end>
           <img [src]="product.product_thumbnail">
         </ion-thumbnail>

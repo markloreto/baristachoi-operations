@@ -53,10 +53,10 @@ export class ItemsModalPage {
         return (item.toLowerCase().indexOf(val.toLowerCase()) > -1);
       }) */
       //this.categories = _.filter(this.categories, {items: [{name: 'Food'}] });
-      var a = []
-      var b = []
+      let a = []
+      let b = []
 
-      for(var x in this.searchCat){
+      for(let x in this.searchCat){
         //b.push(this.searchCat[x])
         a = this.searchCat[x].items.filter((item2) => {
           return (item2.product_name.toLowerCase().indexOf(val.toLowerCase()) > -1);

@@ -22,9 +22,10 @@ export class DeliveryReceiptPage {
   columns: any = [
     { prop: 'date', name: 'Date', minWidth: 130, width: 130 },
     { prop: 'dr', name: 'DR #', minWidth: 60, width: 60  },
-    { prop: 'numKilos', name: 'No. of Kilos', minWidth: 90, width: 90  },
-    { prop: 'amount', name: 'Amount', minWidth: 100, width: 100  },
-    { prop: 'status', name: 'Status', minWidth: 90, width: 80  }
+    { prop: 'numKilos', name: 'No. of Kilos', minWidth: 90, width: 90 },
+    { prop: 'amount', name: 'Amount', minWidth: 100, width: 100 },
+    { prop: 'staff_name', name: 'Created By', minWidth: 150, width: 150 },
+    { prop: 'status', name: 'Status', minWidth: 90, width: 90 },
   ];
   selected: any = []
   page: any = {
@@ -41,13 +42,13 @@ export class DeliveryReceiptPage {
   ) {
     //this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.LANDSCAPE);
 
-    this.myFunctionProvider.dbQuery("SELECT * FROM inventories", []).then((q: any) => {
+    /* this.myFunctionProvider.dbQuery("SELECT * FROM inventories", []).then((q: any) => {
       console.log("inv", q)
     })
 
     this.myFunctionProvider.dbQuery("SELECT * FROM attachments", []).then((q: any) => {
       console.log("attachments", q)
-    })
+    }) */
 
   }
 
@@ -60,11 +61,11 @@ export class DeliveryReceiptPage {
       console.log("Total DRS:", data[0].num)
       this.page.offset = pageInfo.offset;
 
-      this.myFunctionProvider.dbQuery("SELECT myDr.*, ifnull((SELECT SUM(inv.qty) FROM inventories inv JOIN products p ON inv.product_id = p.id WHERE reference_id = myDr.id AND p.category = 1 AND inv.type = 1), 0) AS numKilos, (SELECT SUM(qty * cost) FROM inventories WHERE reference_id = myDr.id) AS amount FROM delivery_receipts myDr ORDER BY myDr.dr DESC LIMIT 5 OFFSET " + (pageInfo.offset * this.page.limit), []).then((drs: any) => {
-        var array = []
+      this.myFunctionProvider.dbQuery("SELECT s.id AS staff_id, s.name AS staff_name, myDr.*, ifnull((SELECT SUM(inv.qty) FROM inventories inv JOIN products p ON inv.product_id = p.id WHERE reference_id = myDr.id AND p.category = 1 AND inv.type = 1 AND module_id = 1), 0) AS numKilos, (SELECT SUM(qty * cost) FROM inventories WHERE reference_id = myDr.id AND module_id = 1) AS amount FROM delivery_receipts myDr INNER JOIN staffs s ON myDr.staff_id = s.id ORDER BY myDr.dr DESC LIMIT 5 OFFSET " + (pageInfo.offset * this.page.limit), []).then((drs: any) => {
+        let array = []
         console.log("Drs", drs)
-        for(var x in drs){
-          array.push({id: drs[x].id, date: moment(drs[x].created_date.replace(" 00:00:00", ""), "YYYY-MM-DD").format("LL"), dr: drs[x].dr, numKilos: drs[x].numKilos + ((drs[x].numKilos) ? " Kgs" : " kg"), amount: "₱ " + drs[x].amount.toLocaleString(), status: "Pending"})
+        for(let x in drs){
+          array.push({staff_id: drs[x].staff_id, id: drs[x].id, date: moment(drs[x].created_date.replace(" 00:00:00", ""), "YYYY-MM-DD").format("LL"), dr: drs[x].dr, numKilos: drs[x].numKilos + ((drs[x].numKilos) ? " Kgs" : " kg"), amount: "₱ " + drs[x].amount.toLocaleString(), status: "Pending", sync: drs[x].sync, staff_name: drs[x].staff_name})
         }
         this.rows = array
         this.myFunctionProvider.spinner(false, "")
@@ -75,50 +76,59 @@ export class DeliveryReceiptPage {
 
   presentActionSheet(s) {
     console.log("Selected", this.selected)
-    const actionSheet = this.actionSheetCtrl.create({
-      title: 'What to do with DR # ' + s.dr,
-      buttons: [
-        {
-          text: 'Archive',
-          handler: () => {
-            console.log('Archive clicked');
-          }
-        },{
-          text: 'Delete',
-          role: 'destructive',
-          handler: () => {
-            this.myFunctionProvider.toastConfirm("DR # " + s.dr, "Delete?", "fa fa-trash").then((b: any) => {
-              if(b){
-                //todo
-                this.myFunctionProvider.spinner(true, "Removing from database")
-                var array = []
-                array.push({table: "delivery_receipts", id: s.id})
-                this.myFunctionProvider.dbQuery("SELECT id, sync FROM attachments WHERE module_id = 1 AND reference_id = ?", [s.id]).then((attachmentIds: any) => {
-                  for(var x in attachmentIds){
-                    array.push({table: "attachments", id: attachmentIds[x].id, sync: attachmentIds[x].sync})
-                  }
-                  this.myFunctionProvider.dbQuery("SELECT id, sync FROM inventories WHERE reference_id = ? AND module_id = 1", [s.id]).then((invIds: any)=> {
-                    for(var x in invIds){
-                      array.push({table: "inventories", id: invIds[x].id, sync: invIds[x].sync})
-                    }
+    let buttons = []
+    if(this.myFunctionProvider.settings.logged_staff == s.staff_id){
+      buttons.push({
+        text: 'Edit',
+        icon: 'create',
+        handler: () => {
+          this.myFunctionProvider.nav.push("AddDrPage", {id: s.id, dr: s.dr})
+        }
+      })
 
-                    this.myFunctionProvider.deleteSync(array).then(() => {
-                      this.myFunctionProvider.spinner(false, "")
-                      this.loadIt({offset: this.page.offset})
-                    })
+      buttons.push({
+        icon: 'trash',
+        text: 'Delete',
+        role: 'destructive',
+        handler: () => {
+          this.myFunctionProvider.toastConfirm("DR # " + s.dr, "Delete?", "fa fa-trash").then((b: any) => {
+            if(b){
+              //todo
+              this.myFunctionProvider.spinner(true, "Removing from database")
+              let array = []
+              array.push({table: "delivery_receipts", id: s.id, sync: s.sync})
+              this.myFunctionProvider.dbQuery("SELECT id, sync FROM attachments WHERE module_id = 1 AND reference_id = ?", [s.id]).then((attachmentIds: any) => {
+                for(let x in attachmentIds){
+                  array.push({table: "attachments", id: attachmentIds[x].id, sync: attachmentIds[x].sync})
+                }
+                this.myFunctionProvider.dbQuery("SELECT id, sync FROM inventories WHERE reference_id = ? AND module_id = 1", [s.id]).then((invIds: any)=> {
+                  for(let x in invIds){
+                    array.push({table: "inventories", id: invIds[x].id, sync: invIds[x].sync})
+                  }
+
+                  this.myFunctionProvider.deleteSync(array).then(() => {
+                    this.myFunctionProvider.spinner(false, "")
+                    this.loadIt({offset: this.page.offset})
                   })
                 })
-              }
-            })
-          }
-        },{
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            console.log('Cancel clicked');
-          }
+              })
+            }
+          })
         }
-      ]
+      })
+    }
+
+    buttons.push({
+      text: 'Cancel',
+      role: 'cancel',
+      handler: () => {
+        console.log('Cancel clicked');
+      }
+    })
+
+    const actionSheet = this.actionSheetCtrl.create({
+      title: 'What to do with DR # ' + s.dr,
+      buttons: buttons
     });
     actionSheet.present();
   }
@@ -143,7 +153,7 @@ export class DeliveryReceiptPage {
     console.log('Select Event', selected, this.selected);
     console.log("Selected", this.selected)
     //this.selected = []
-    var s = selected[0]
+    let s = selected[0]
     this.presentActionSheet(s)
 
 

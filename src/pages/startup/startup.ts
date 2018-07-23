@@ -187,7 +187,7 @@ export class StartupPage {
         this.myFunctionProvider.spinner(true, "Building Database")
         this.myFunctionProvider.APIGet("getProductCategories").then((cats: any) => {
           console.log("product categories", cats)
-          for(var x in cats.data){
+          for(let x in cats.data){
             this.myFunctionProvider.dbQuery("INSERT OR REPLACE INTO product_categories VALUES(?, ?, ?)", [cats.data[x].id, cats.data[x].name, cats.data[x].sequence])
           }
 

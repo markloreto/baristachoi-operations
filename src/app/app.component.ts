@@ -88,11 +88,11 @@ export class MyApp {
             if(this.nav.canGoBack() || nav && nav.isOverlay) {
               this.nav.pop();
             } else {
-              if(this.nav.getActive().component.name == "TabsPage"){
+              if(this.nav.getActive().component.name == "HomePage"){
                 //this.appMinimize.minimize()
               }
               else{
-                this.nav.setRoot("HomePage")
+                //this.nav.setRoot("HomePage")
               }
             }
           }
@@ -169,6 +169,10 @@ export class MyApp {
       });
     }
     document.addEventListener('onSMSArrive', this.newSMS);
+  }
+
+  menuOpened(){
+    this.events.publish('menu:opened', '');
   }
 }
 

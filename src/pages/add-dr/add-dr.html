@@ -5,7 +5,7 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-  <my-header title="Add new DR" headerColor="primary" [menuEnable]="true"></my-header>
+  <my-header [title]="title" headerColor="primary" [menuEnable]="true"></my-header>
   <ion-toolbar color="secondary">
     <ion-segment [(ngModel)]="segment">
       <ion-segment-button value="details">
@@ -45,7 +45,7 @@
       <ion-card>
 
         <ion-item [class.border-danger]="isValid('notes')" class="myItems">
-          <ion-textarea formControlName="notes" name="notes" autocomplete="on" autocorrect="on" placeholder="Notes"></ion-textarea>
+          <ion-textarea formControlName="notes" name="notes" autocomplete="on" autocorrect="on" placeholder="Notes" rows="7"></ion-textarea>
         </ion-item>
       </ion-card>
     </form>
@@ -75,7 +75,7 @@
           <ngx-datatable-column name="" prop="thumbnail" [width]="64" [minWidth]="64">
             <ng-template let-value="value" ngx-datatable-cell-template>
               <div style="display: contents">
-                <img class="img-40 img-radius" [src]="(value) ? myFunctionProvider.sanitize(value) : 'assets/images/bc5.jpg'" alt="User-Profile-Image">
+                <img class="img-40 img-radius" [src]="value">
               </div>
             </ng-template>
           </ngx-datatable-column>

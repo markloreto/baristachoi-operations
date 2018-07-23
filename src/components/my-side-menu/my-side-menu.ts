@@ -78,20 +78,21 @@ export class MySideMenuComponent {
   staff: any
   myMenu: any = []
 
+
   constructor(
     public menuItems: MenuItems,
     public events: Events,
     public myFunctionProvider: MyFunctionProvider,
     public app: App
   ) {
-    var myMenu = this.menuItems.getAll()
+    let myMenu = this.menuItems.getAll()
     this.myMenu = myMenu
     console.log("myMenu", myMenu)
 
     this.myFunctionProvider.dbQuery("SELECT id, name FROM product_categories ORDER BY sequence", []).then((data: any) => {
-      var cat = []
-      for(var x in data){
-        cat.push({badge: [{type: "warning", value: "100"}], state: "ProductCategoryPage", name: data[x].name, data: {name: data[x].name, id: data[x].id}})
+      let cat = []
+      for(let x in data){
+        cat.push({badge: [{type: "warning", value: 10}], state: "ProductCategoryPage", name: data[x].name, data: {name: data[x].name, id: data[x].id}})
       }
       console.log("Categories", cat)
       this.myMenu[0].main[0].children = cat
@@ -100,6 +101,10 @@ export class MySideMenuComponent {
     this.events.subscribe("staff:login", (settings) => {
       this.loadIt(settings)
     })
+
+    events.subscribe('menu:opened', () => {
+      // your action here
+  });
 
     this.navType = 'st2';
     this.themeLayout = 'vertical';

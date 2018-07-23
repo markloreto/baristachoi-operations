@@ -89,11 +89,11 @@
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
     <plugin name="cordova-open-native-settings" spec="^1.5.1" />
     <plugin name="cordova-plugin-android-permissions" spec="^1.0.0" />
-    <engine name="android" spec="7.0.0" />
     <plugin name="cordova-plugin-camera" spec="^4.0.3" />
     <plugin name="info.protonet.imageresizer" spec="^0.1.1" />
     <plugin name="cordova-plugin-file" spec="^6.0.1" />
     <plugin name="cordova-plugin-filechooser" spec="^1.0.1" />
     <plugin name="cordova-plugin-screen-orientation" spec="^3.0.1" />
     <plugin name="com-sarriaroman-photoviewer" spec="^1.1.18" />
+    <engine name="android" spec="7.0.0" />
 </widget>

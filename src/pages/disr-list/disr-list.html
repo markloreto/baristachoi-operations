@@ -1,0 +1,69 @@
+<!--
+  Generated template for the DisrListPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <my-header title="DISR List" headerColor="primary" [menuEnable]="true"></my-header>
+</ion-header>
+
+
+<ion-content>
+  <ion-card>
+    <ngx-datatable #myTable [groupRowsBy]="'dealer'" [groupExpansionDefault]="true" (page)='loadIt($event)' [count]="page.count"
+      [offset]="page.offset" [externalPaging]="true" [limit]="page.limit" [rows]="rows" [columns]="columns" class="material expandable"
+      [scrollbarH]="true" [columnMode]="'standard'" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
+      (select)='onSelect($event)' [footerHeight]="50">
+
+      <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
+        <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
+          <div style="padding-left:5px;">
+            <b>{{group.key}}:</b>
+          </div>
+        </ng-template>
+      </ngx-datatable-group-header>
+    </ngx-datatable>
+
+  </ion-card>
+  <ion-fab top right edge>
+    <button ion-fab mini color="secondary" (click)="add()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
+
+  <div class="popup-menu">
+    <div class="popup-menu-overlay" [ngClass]="{'in': openMenu}" (click)="togglePopupMenu()"></div>
+    <div class="popup-menu-toggle" (click)="togglePopupMenu()" [ngClass]="{'out': openMenu}"></div>
+    <div class="popup-menu-panel" [ngClass]="{'in': openMenu}">
+      <div class="popup-menu-item" (click)="goToHome()">
+        <ion-icon name="home"></ion-icon>
+        <ion-badge>25</ion-badge>
+        <span>HOME</span>
+      </div>
+      <div class="popup-menu-item" (click)="goToCups()">
+        <ion-icon name="trophy"></ion-icon>
+        <span>CUPS</span>
+      </div>
+      <div class="popup-menu-item" (click)="goToLeaderboard()">
+        <ion-icon name="podium"></ion-icon>
+        <ion-badge>10</ion-badge>
+        <span>LEADERBOARD</span>
+      </div>
+      <div class="popup-menu-item" (click)="goToHelp()">
+        <ion-icon name="help"></ion-icon>
+        <span>HELP</span>
+      </div>
+      <div class="popup-menu-item" (click)="goToAccount()">
+        <ion-icon name="person"></ion-icon>
+        <ion-badge>5</ion-badge>
+        <span>ACCOUNT</span>
+      </div>
+      <div class="popup-menu-item" (click)="goToShop()">
+        <ion-icon name="cart"></ion-icon>
+        <ion-badge>25</ion-badge>
+        <span>SHOP</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

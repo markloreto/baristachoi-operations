@@ -33,17 +33,17 @@ export class LoginPage {
 
   updateStaffs(array){
     this.myFunctionProvider.APIGet("getRoles").then((result: any) => {
-      var d = result.data
-      var a = []
-      for(var x in d){
+      let d = result.data
+      let a = []
+      for(let x in d){
         a.push(["INSERT OR REPLACE INTO roles (id, name) VALUES (?, ?)", [d[x].id, d[x].display_name]])
       }
 
       this.myFunctionProvider.dbQueryBatch(a).then((rolesB: any) => {
         console.log("roles batch", rolesB)
-        var b = []
-        for(var x in array){
-          b.push(["INSERT OR REPLACE INTO staffs (id, depot_id, name, photo, thumbnail, role_id, created_at, updated_at, sync) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [array[x].id, array[x].depot_id, array[x].name, array[x].photo, array[x].thumbnail, array[x].role_id, array[x].created_at, array[x].updated_at, this.myFunctionProvider.getTimestamp()]])
+        let b = []
+        for(let x in array){
+          b.push(["INSERT OR REPLACE INTO staffs (id, depot_id, name, photo, thumbnail, role_id, sync) VALUES (?, ?, ?, ?, ?, ?, ?)", [array[x].id, array[x].depot_id, array[x].name, array[x].photo, array[x].thumbnail, array[x].role_id, 2]])
         }
         this.myFunctionProvider.dbQueryBatch(b).then((staffsB: any) => {
           console.log("staff batch", staffsB)
@@ -55,7 +55,8 @@ export class LoginPage {
   }
 
   loadList(){
-    this.myFunctionProvider.dbQuery("SELECT staffs.*, roles.name AS role_name FROM staffs, roles WHERE staffs.role_id = roles.id", []).then((staffs: any) => {
+    this.myFunctionProvider.spinner(true, "Retrieving List...")
+    this.myFunctionProvider.dbQuery("SELECT staffs.*, roles.name AS role_name FROM staffs, roles WHERE staffs.role_id = roles.id AND roles.id = 4", []).then((staffs: any) => {
       console.log("Staffs", staffs)
       this.staffs = staffs
 
@@ -63,7 +64,7 @@ export class LoginPage {
         this.myFunctionProvider.checkInternetConnection().then((i:any) => {
           if(i){
             if(!staffs.length)
-              this.myFunctionProvider.spinner(true, "Retrieving List...")
+
             this.myFunctionProvider.APIGet("staff").then((result: any) => {
               console.log(result)
               if(!staffs.length)
@@ -79,8 +80,11 @@ export class LoginPage {
                 title: 'Oops...',
                 text: 'Failed to retrieve the list... Please check your internet connection'
               })
+            this.myFunctionProvider.spinner(false, "")
           }
         })
+      }else{
+        this.myFunctionProvider.spinner(false, "")
       }
 
     })

@@ -19,6 +19,10 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 0px !important
 }
 
+.fl{ float: left;}
+
+.fr{float: right;}
+
 .menu-inner {
     width: 270px !important
 }
@@ -75,6 +79,8 @@ h1, h2, h3, h4, h5, h6 {
 .my-success .toast-container {
   background-color: #93be52
 }
+
+.itemDivider:not(:last-child){border-bottom: 1px dashed map-get($colors, primary)}
 
 //fixes bootstrap to ionic
 .item-md .label{

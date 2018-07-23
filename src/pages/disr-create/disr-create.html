@@ -1,0 +1,176 @@
+<!--
+  Generated template for the DisrCreatePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+
+  id
+staff_id
+dealer_id
+depot_id
+date
+sequence
+notes
+Kilometer reading start
+Kilometer reading end
+-->
+<ion-header>
+  <my-header [title]="title" headerColor="primary" [menuEnable]="true"></my-header>
+  <ion-toolbar color="secondary">
+    <ion-segment [(ngModel)]="segment">
+      <ion-segment-button value="details">
+        Details
+      </ion-segment-button>
+      <ion-segment-button value="items">
+        Items
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <div [ngSwitch]="segment" class="mb5em">
+    <form [formGroup]="myForm" *ngSwitchCase="'details'">
+      <ion-card>
+        <div class="card widget-card-user">
+          <div class="card-block p-b-0">
+            <div class="card-user">
+              <img [src]="dealer.thumbnail" alt="" class="text-right">
+              <span class="label bg-c-blue card-bedges">{{(id) ? "MODIFICATION" : "NEW"}}</span>
+              <h4 class="p-t-10 p-b-10 m-t-0">{{dealer.name}}</h4>
+              <span class="text-c-green f-14">California USA</span>
+            </div>
+          </div>
+          <div class="card-footer b-t-default">
+            <div class="row">
+              <div class="col-sm-4 footer-menu text-center">
+                <p class="text-muted f-w-400 m-0 f-16">Sequence #</p>
+                <span class="f-14 f-w-400">{{sequence}}</span>
+              </div>
+              <div class="col-sm-4 footer-menu text-center">
+                <p class="text-muted f-w-400 m-0 f-16">Total Kilometers</p>
+                <span class="f-14 f-w-400">{{kmTotal}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card>
+      <ion-card>
+        <ion-list>
+          <ion-item class="myItems">
+            <ion-label>Date</ion-label>
+            <ion-datetime displayFormat="MMMM DD, YYYY hh:mm A" pickerFormat="MMMM DD YYYY hh:mm A" formControlName="date" (ionChange)="changeDate()"></ion-datetime>
+          </ion-item>
+
+          <ion-item [class.border-danger]="isValid('km_start')">
+            <ion-label>Kilometer Reading Start</ion-label>
+            <ion-input type="tel" formControlName="km_start" (ionChange)="kmChange()"></ion-input>
+          </ion-item>
+
+          <ion-item [class.border-danger]="isValid('km_end')">
+            <ion-label>Kilometer Reading End</ion-label>
+            <ion-input type="tel" formControlName="km_end" (ionBlur)="kmChange()"></ion-input>
+          </ion-item>
+
+        </ion-list>
+
+      </ion-card>
+      <ion-card>
+
+        <ion-item [class.border-danger]="isValid('notes')" class="myItems">
+          <ion-textarea formControlName="notes" name="notes" autocomplete="on" autocorrect="on" placeholder="Notes" rows="7"></ion-textarea>
+        </ion-item>
+      </ion-card>
+    </form>
+    <div *ngSwitchCase="'items'">
+      <ion-card>
+        <ion-fab top right *ngIf="(segment === 'items')">
+          <button ion-fab color="tertiary" mini (click)="addItem()">
+            <ion-icon name="list-box"></ion-icon>
+          </button>
+        </ion-fab>
+        <ion-item>
+          <h2>Sequence # </h2>
+          <p>{{myForm.controls["date"].value}}</p>
+        </ion-item>
+        <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable" [scrollbarH]="true" [columnMode]="'force'"
+          [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
+          (select)='onSelect($event)' [footerHeight]="50" [rowHeight]="'auto'" (tableContextmenu)="onTableContextMenu($event)" [sorts]="[{prop: 'sequence', dir: 'asc'}]">
+
+          <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
+            <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
+              <div style="padding-left:5px;">
+                <b>{{group.key}}:</b> {{sumIt(group)}}
+              </div>
+            </ng-template>
+          </ngx-datatable-group-header>
+
+          <ngx-datatable-column name='Product Name' prop="name" [flexGrow]="3" [minWidth]="180" [frozenLeft]="true" [width]="180">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <div style="display: contents"><i *ngIf="row.remaining !== ''" class="fa fa-check-square-o" style="color: green"></i><i *ngIf="row.remaining === ''" class="fa fa-warning" style="color: darkgoldenrod"></i> {{value}}</div>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="previous" name="Previous Unsold" [flexGrow]="3" [minWidth]="140" [width]="140">
+            <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+              {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="load" name="Load" [flexGrow]="3" [minWidth]="140" [width]="140">
+            <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+              {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="total" name="Total Stock" [flexGrow]="3" [minWidth]="140" [width]="140">
+            <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+              {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="remaining" name="Remaining Stock" [flexGrow]="3" [minWidth]="140" [width]="140">
+            <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+              {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="sold" [flexGrow]="3" [minWidth]="140" [width]="140">
+            <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+              {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="price" [flexGrow]="3" [minWidth]="140" [width]="140">
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              ₱ {{value | number:'.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="amount" [flexGrow]="3" [minWidth]="140" [width]="140">
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              {{(value==="") ? "Unset" : "₱ " + (value | number:'.2-2')}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-footer>
+            <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize" let-selectedCount="selectedCount"
+              let-curPage="curPage" let-offset="offset">
+              <div style="padding: 5px 10px; width: 100%; text-align: right; font-size: medium">
+                <div>
+                  <strong>Grand Total</strong>: ₱ {{grandTotal | number:'.2-2'}}
+                </div>
+              </div>
+            </ng-template>
+          </ngx-datatable-footer>
+        </ngx-datatable>
+      </ion-card>
+    </div>
+  </div>
+
+  <ion-fab right bottom>
+    <button ion-fab color="primary" (click)="submit()">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </ion-fab>

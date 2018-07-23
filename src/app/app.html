@@ -1,4 +1,4 @@
-<ion-menu [content]="content" type="push" [swipeEnabled]="menuSlide">
+<ion-menu [content]="content" type="push" [swipeEnabled]="menuSlide" (ionOpen)="menuOpened()">
     <ion-content>
         <my-side-menu *ngIf="menuSlide"></my-side-menu>
     </ion-content>
