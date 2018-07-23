@@ -33,6 +33,19 @@ Kilometer reading end
   <div [ngSwitch]="segment" class="mb5em">
     <form [formGroup]="myForm" *ngSwitchCase="'details'">
       <ion-card>
+
+        <ion-item>
+          <ion-avatar item-start>
+            <img [src]="dealer.thumbnail">
+          </ion-avatar>
+          <h2>{{dealer.name}}</h2>
+          <p>{{readableDate("date")}}</p>
+          <span class="label bg-c-blue card-bedges" style="color: white !important" item-end>
+             # {{sequence}}
+          </span>
+        </ion-item>
+      </ion-card>
+      <ion-card>
         <div class="card widget-card-user">
           <div class="card-block p-b-0">
             <div class="card-user">
@@ -96,7 +109,8 @@ Kilometer reading end
         </ion-item>
         <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable" [scrollbarH]="true" [columnMode]="'force'"
           [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
-          (select)='onSelect($event)' [footerHeight]="50" [rowHeight]="'auto'" (tableContextmenu)="onTableContextMenu($event)" [sorts]="[{prop: 'sequence', dir: 'asc'}]">
+          (select)='onSelect($event)' [footerHeight]="50" [rowHeight]="'auto'" (tableContextmenu)="onTableContextMenu($event)"
+          [sorts]="[{prop: 'sequence', dir: 'asc'}]">
 
           <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
             <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
@@ -108,7 +122,9 @@ Kilometer reading end
 
           <ngx-datatable-column name='Product Name' prop="name" [flexGrow]="3" [minWidth]="180" [frozenLeft]="true" [width]="180">
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-              <div style="display: contents"><i *ngIf="row.remaining !== ''" class="fa fa-check-square-o" style="color: green"></i><i *ngIf="row.remaining === ''" class="fa fa-warning" style="color: darkgoldenrod"></i> {{value}}</div>
+              <div style="display: contents">
+                <i *ngIf="row.remaining !== ''" class="fa fa-check-square-o" style="color: green"></i>
+                <i *ngIf="row.remaining === ''" class="fa fa-warning" style="color: darkgoldenrod"></i> {{value}}</div>
             </ng-template>
           </ngx-datatable-column>
 

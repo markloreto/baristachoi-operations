@@ -109,7 +109,7 @@ export class DisrCreatePage {
       //Edit Code
       let fc = this.myForm.controls
       this.id = navParams.get("id")
-      this.title = (this.id) ? "Modify Sequence # " + navParams.get("sequence") : "Add new DR"
+      this.title = (this.id) ? "Modify Sequence # " + navParams.get("sequence") : "Add new DISR"
 
       if (this.id) {
         this.myFunctionProvider.spinner(true, "Please wait...")
@@ -120,7 +120,7 @@ export class DisrCreatePage {
           fc.notes.setValue(disr.notes)
           this.grandTotal = 0
           let newCheckItems = [] //sold // ifnull((SELECT SUM(i.qty - i.remaining) FROM inventories i LEFT JOIN disrs d ON i.reference_id = d.id WHERE d.dealer_id = ? AND product_id = p.id AND i.remaining IS NOT NULL AND i.module_id = 2 AND i.type = 2 AND strftime('%s', d.created_date) < strftime('%s', ?)), 0)
-          this.myFunctionProvider.dbQuery("SELECT p.sequence AS sequence, inv.*, ifnull((SELECT i.remaining FROM inventories i LEFT JOIN disrs d ON i.reference_id = d.id WHERE d.dealer_id = ? AND i.product_id = p.id AND d.sequence = ? AND i.module_id = 2 AND i.type = 2 LIMIT 1), 0) AS previous, p.name AS product_name, pc.name AS category_name, p.cost AS product_cost, p.price AS product_price, mu.abbr AS abbr, p.thumbnail AS product_thumbnail FROM inventories inv INNER JOIN products p ON inv.product_id = p.id INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id WHERE inv.module_id = 2 AND inv.reference_id = ? ORDER BY p.sequence ASC", [this.dealer.id, this.sequence - 1, this.id]).then((invs: any) => {
+          this.myFunctionProvider.dbQuery("SELECT p.sequence AS sequence, inv.*, ifnull((SELECT i.remaining FROM inventories i LEFT JOIN disrs d ON i.reference_id = d.id WHERE d.dealer_id = ? AND i.product_id = p.id AND d.sequence < ? AND i.module_id = 2 AND i.type = 2 ORDER BY d.sequence DESC LIMIT 1), 0) AS previous, p.name AS product_name, pc.name AS category_name, p.cost AS product_cost, p.price AS product_price, mu.abbr AS abbr, p.thumbnail AS product_thumbnail FROM inventories inv INNER JOIN products p ON inv.product_id = p.id INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id WHERE inv.module_id = 2 AND inv.reference_id = ? ORDER BY p.sequence ASC", [this.dealer.id, this.sequence, this.id]).then((invs: any) => {
             console.log("New INVS", invs)
             for (let x in invs) {
               newCheckItems.push({
@@ -168,7 +168,7 @@ export class DisrCreatePage {
         })
       } else {
         let newCheckItems = [] //
-        this.myFunctionProvider.dbQuery("SELECT p.sequence AS sequence, mu.abbr AS abbr, pc.name AS category_name, p.*, ifnull((SELECT i.remaining FROM inventories i LEFT JOIN disrs d ON i.reference_id = d.id WHERE d.dealer_id = ? AND i.product_id = p.id AND d.sequence = ? AND i.module_id = 2 AND i.type = 2 LIMIT 1), 0) AS previous FROM products p INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id WHERE previous != 0 ORDER BY p.sequence ASC", [this.dealer.id, this.sequence - 1]).then((invs: any) => {
+        this.myFunctionProvider.dbQuery("SELECT p.sequence AS sequence, mu.abbr AS abbr, pc.name AS category_name, p.*, ifnull((SELECT i.remaining FROM inventories i LEFT JOIN disrs d ON i.reference_id = d.id WHERE d.dealer_id = ? AND i.product_id = p.id AND d.sequence < ? AND i.module_id = 2 AND i.type = 2 ORDER BY d.sequence DESC LIMIT 1), 0) AS previous FROM products p INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id WHERE previous != 0 ORDER BY p.sequence ASC", [this.dealer.id, this.sequence]).then((invs: any) => {
           console.log("New INVS", invs)
           for (let x in invs) {
             newCheckItems.push({
@@ -342,6 +342,11 @@ export class DisrCreatePage {
         this.navCtrl.pop()
       }
     })
+  }
+
+  readableDate(date){
+    let fc = this.myForm.controls
+    return moment(fc[date].value, "YYYY-MM-DD HH:mm").format("LLL")
   }
 
   onSelect({ selected }) {

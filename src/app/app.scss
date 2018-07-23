@@ -35,6 +35,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: map-get($colors, primary) !important
 }
 
+ion-label.label-md{
+  padding: 0px !important
+}
+
 .card-md {
   border-radius: 10px
 }
