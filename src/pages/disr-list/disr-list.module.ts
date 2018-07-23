@@ -3,6 +3,8 @@ import { IonicPageModule } from 'ionic-angular';
 import { DisrListPage } from './disr-list';
 import { MyHeaderComponentModule } from '../../components/my-header/my-header.module';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { PopupMenuComponentModule } from '../../components/popup-menu/popup-menu.module';
+
 
 @NgModule({
   declarations: [
@@ -11,7 +13,8 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
   imports: [
     IonicPageModule.forChild(DisrListPage),
     MyHeaderComponentModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    PopupMenuComponentModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
