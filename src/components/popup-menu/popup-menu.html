@@ -1,0 +1,11 @@
+<div class="popup-menu">
+  <div class="popup-menu-overlay" [ngClass]="{'in': openMenu}" (click)="togglePopupMenu()"></div>
+  <div class="popup-menu-toggle" (click)="togglePopupMenu()" [ngClass]="{'out': openMenu}"></div>
+  <div class="popup-menu-panel" [ngClass]="{'in': openMenu}">
+    <div *ngFor="let btn of btns" class="popup-menu-item" (click)="myBtn(btn)">
+      <ion-icon [name]="btn.icon"></ion-icon>
+      <ion-badge *ngIf="btn.badge">{{btn.badge}}</ion-badge>
+      <span>{{btn.title}}</span>
+    </div>
+  </div>
+</div>
