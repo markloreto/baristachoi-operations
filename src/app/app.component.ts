@@ -6,6 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { OneSignal } from '@ionic-native/onesignal';
 import { BackgroundMode } from '@ionic-native/background-mode';
 import { Network } from '@ionic-native/network';
+import { Deeplinks } from '@ionic-native/deeplinks';
 
 declare var window;
 
@@ -37,7 +38,8 @@ export class MyApp {
     public ionicApp: IonicApp,
     public myFunctionProvider: MyFunctionProvider,
     private network: Network,
-    public menuCtrl: MenuController
+    public menuCtrl: MenuController,
+    private deeplinks: Deeplinks
   ) {
 
     platform.ready().then(() => {
@@ -45,6 +47,22 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+
+      this.deeplinks.routeWithNavController(this.nav, {
+        /* '/load/:depot_id/:sequence/:staff_id/:dealer_id/:items': "SyncPage" */
+      }).subscribe(match => {
+        // match.$route - the route we matched, which is the matched entry from the arguments to route()
+        // match.$args - the args passed in the link
+        // match.$link - the full link data
+        console.log('Successfully matched route', match);
+        if(match.$link.host == "load"){
+          let args = match.$link.path.split("/");
+          console.log(args)
+        }
+      }, nomatch => {
+        // nomatch.$link - the full link data
+        console.error('Got a deeplink that didn\'t match', nomatch);
+      });
 
       this.oneSignal.startInit('ede7798c-0b4e-4b5f-815d-00829678734f', '233348829004');
 

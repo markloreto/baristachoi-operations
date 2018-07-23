@@ -31,6 +31,7 @@ export class DisrCreatePage {
 
   title: string
 
+  qrValue: any
   rows: any = [];
   columns: any = [
     { prop: 'name', name: 'Name' },
@@ -55,6 +56,9 @@ export class DisrCreatePage {
 
   grandTotal: number = 0
 
+  prev: number
+  next: number
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -68,25 +72,41 @@ export class DisrCreatePage {
     this.dealer = navParams.get("dealer")
     this.id = navParams.get("id")
 
-    if (!this.id) {
-
-      this.myFunctionProvider.dbQuery("SELECT sequence FROM disrs ORDER BY sequence DESC LIMIT 1", []).then((seq: any) => {
-        if (seq.length) {
-          this.sequence = seq[0].sequence + 1
-        } else {
-          this.sequence = 1
-        }
-      })
-    } else {
-      this.sequence = navParams.get("sequence")
-    }
-
     this.myForm = formBuilder.group({
       date: [moment().format("YYYY-MM-DDTHH:mm"), Validators.required],
       km_start: ['0', Validators.required],
       km_end: ['0', Validators.required],
       notes: [""]
     });
+
+    if (!this.id) {
+
+      this.myFunctionProvider.dbQuery("SELECT sequence FROM disrs ORDER BY sequence DESC LIMIT 1", []).then((seq: any) => {
+        if (seq.length) {
+          this.sequence = seq[0].sequence + 1
+          this.start()
+        } else {
+          this.sequence = 1
+          this.start()
+        }
+      })
+    } else {
+      this.sequence = navParams.get("sequence")
+      this.start()
+    }
+  }
+
+  start(){
+    //prev
+    this.myFunctionProvider.dbQuery("SELECT d.sequence AS prev FROM disrs d WHERE d.dealer_id = ? AND d.sequence < ? ORDER BY d.sequence DESC LIMIT 1", [this.dealer.id, this.sequence]).then((prev: any) => {
+      console.log("Prev", prev)
+      this.prev = prev[0].prev
+    })
+    //next
+    this.myFunctionProvider.dbQuery("SELECT d.sequence AS next FROM disrs d WHERE d.dealer_id = ? AND d.sequence > ? ORDER BY d.sequence ASC LIMIT 1", [this.dealer.id, this.sequence]).then((next: any) => {
+      console.log("Next", next)
+      this.next = next[0].next
+    })
 
     this.myFunctionProvider.dbQuery("SELECT p.sequence AS sequence, p.id AS product_id, p.cost AS product_cost, p.price AS product_price, p.sku AS product_sku, p.thumbnail AS product_thumbnail, p.name AS product_name, pc.name AS category_name, mu.abbr AS abbr FROM products p INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id ORDER BY p.sequence ASC", []).then((products: any) => {
       let grouped = _.chain(products)
@@ -108,13 +128,14 @@ export class DisrCreatePage {
 
       //Edit Code
       let fc = this.myForm.controls
-      this.id = navParams.get("id")
-      this.title = (this.id) ? "Modify Sequence # " + navParams.get("sequence") : "Add new DISR"
+      this.id = this.navParams.get("id")
+      this.title = (this.id) ? "Modify Sequence # " + this.navParams.get("sequence") : "Add new DISR"
 
       if (this.id) {
         this.myFunctionProvider.spinner(true, "Please wait...")
         this.myFunctionProvider.dbQuery("SELECT * FROM disrs WHERE id = ?", [this.id]).then((disr: any) => {
           disr = disr[0]
+          let qrItems = []
           this.sync = disr.sync
           fc.date.setValue(disr.created_date.replace(" ", "T").slice(0, -3))
           fc.notes.setValue(disr.notes)
@@ -141,6 +162,8 @@ export class DisrCreatePage {
                 amount: (invs[x].remaining !== null) ? invs[x].sold * invs[x].product_price : ""
               })
 
+              qrItems.push({id: invs[x].product_id, prc: invs[x].product_price, qty: invs[x].qty})
+
               if (newCheckItems[x].amount != - "")
                 this.grandTotal += newCheckItems[x].amount
 
@@ -148,6 +171,8 @@ export class DisrCreatePage {
               //this.deletes.push({ table: "inventories", id: invs[x].id, sync: invs[x].sync })
               this.pids.push({ table: "inventories", ref: invs[x].product_id, tid: invs[x].id })
             }
+
+            this.qrValue = "baristachoi://load/" + this.depot_id + "/" + this.sequence + "/" + this.staff_id + "/" + this.dealer.id + "/" + JSON.stringify(qrItems)
 
 
             for (let x in grouped) {
@@ -267,6 +292,13 @@ export class DisrCreatePage {
       })
 
     }
+  }
+
+  goTo(seq){
+    this.navCtrl.push(this.navCtrl.getActive().component, { sequence: seq, staff_id: this.staff_id, id: this.id, dealer: this.dealer }).then(() => {
+      let index = this.viewCtrl.index;
+      this.navCtrl.remove(index);
+    })
   }
 
   submit() {

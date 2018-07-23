@@ -3,6 +3,7 @@ import { IonicPageModule } from 'ionic-angular';
 import { DisrCreatePage } from './disr-create';
 import { MyHeaderComponentModule } from '../../components/my-header/my-header.module';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { NgxQRCodeModule } from 'ngx-qrcode3';
 
 @NgModule({
   declarations: [
@@ -11,7 +12,8 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
   imports: [
     IonicPageModule.forChild(DisrCreatePage),
     MyHeaderComponentModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    NgxQRCodeModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

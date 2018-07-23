@@ -96,4 +96,22 @@
     <plugin name="cordova-plugin-screen-orientation" spec="^3.0.1" />
     <plugin name="com-sarriaroman-photoviewer" spec="^1.1.18" />
     <engine name="android" spec="7.0.0" />
+    <plugin name="ionic-plugin-deeplinks" spec="^1.0.17">
+        <variable name="URL_SCHEME" value="baristachoi" />
+        <variable name="DEEPLINK_SCHEME" value="https" />
+        <variable name="DEEPLINK_HOST" value="baristachoi.com.ph" />
+        <variable name="ANDROID_PATH_PREFIX" value="/" />
+        <variable name="ANDROID_2_PATH_PREFIX" value="/" />
+        <variable name="ANDROID_3_PATH_PREFIX" value="/" />
+        <variable name="ANDROID_4_PATH_PREFIX" value="/" />
+        <variable name="ANDROID_5_PATH_PREFIX" value="/" />
+        <variable name="DEEPLINK_2_SCHEME" value=" " />
+        <variable name="DEEPLINK_2_HOST" value=" " />
+        <variable name="DEEPLINK_3_SCHEME" value=" " />
+        <variable name="DEEPLINK_3_HOST" value=" " />
+        <variable name="DEEPLINK_4_SCHEME" value=" " />
+        <variable name="DEEPLINK_4_HOST" value=" " />
+        <variable name="DEEPLINK_5_SCHEME" value=" " />
+        <variable name="DEEPLINK_5_HOST" value=" " />
+    </plugin>
 </widget>

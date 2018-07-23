@@ -41,9 +41,24 @@ Kilometer reading end
           <h2>{{dealer.name}}</h2>
           <p>{{readableDate("date")}}</p>
           <span class="label bg-c-blue card-bedges" style="color: white !important" item-end>
-             # {{sequence}}
+            # {{sequence}}
           </span>
         </ion-item>
+        <ngx-qrcode [qrc-value]="qrValue" [qrc-version]="10" [qrc-correction-level]="'L'" [elementType]="'img'" *ngIf="id"></ngx-qrcode>
+        <ion-row>
+          <ion-col>
+            <button ion-button icon-start clear small block [disabled]="!prev" (click)="goTo(prev)">
+              <ion-icon name="arrow-dropleft-circle"></ion-icon>
+              <div>{{(prev) ? "Sequence # " + prev : ""}}</div>
+            </button>
+          </ion-col>
+          <ion-col style="text-align: right">
+            <button ion-button icon-end clear small block [disabled]="!next" (click)="goTo(next)">
+              <div>{{(next) ? "Sequence # " + next : ""}}</div>
+              <ion-icon name="arrow-dropright-circle"></ion-icon>
+            </button>
+          </ion-col>
+        </ion-row>
       </ion-card>
       <ion-card>
         <div class="card widget-card-user">
