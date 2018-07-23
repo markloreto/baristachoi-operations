@@ -94,7 +94,7 @@ Kilometer reading end
           <h2>Sequence # </h2>
           <p>{{myForm.controls["date"].value}}</p>
         </ion-item>
-        <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable" [scrollbarH]="true" [columnMode]="'force'"
+        <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable" [scrollbarH]="true" [scrollbarV]="true" [columnMode]="'force'"
           [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
           (select)='onSelect($event)' [footerHeight]="50" [rowHeight]="'auto'" (tableContextmenu)="onTableContextMenu($event)" [sorts]="[{prop: 'sequence', dir: 'asc'}]">
 

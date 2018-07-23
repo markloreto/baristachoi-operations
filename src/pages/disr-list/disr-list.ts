@@ -54,7 +54,7 @@ export class DisrListPage {
       console.log("Total DRS:", data[0].num)
       this.page.offset = pageInfo.offset;
 
-      this.myFunctionProvider.dbQuery("SELECT s.id AS staff_id, s.name AS staff_name, d.*, (SELECT name FROM staffs WHERE id = d.dealer_id) AS dealer, (SELECT id FROM staffs WHERE id = d.dealer_id) AS dealer_id, (SELECT thumbnail FROM staffs WHERE id = d.dealer_id) AS thumbnail FROM disrs d INNER JOIN staffs s ON d.staff_id = s.id ORDER BY d.sequence DESC LIMIT 5 OFFSET " + (pageInfo.offset * this.page.limit), []).then((disrs: any) => {
+      this.myFunctionProvider.dbQuery("SELECT s.id AS staff_id, s.name AS staff_name, d.*, (SELECT name FROM staffs WHERE id = d.dealer_id) AS dealer, (SELECT id FROM staffs WHERE id = d.dealer_id) AS dealer_id, (SELECT thumbnail FROM staffs WHERE id = d.dealer_id) AS thumbnail FROM disrs d INNER JOIN staffs s ON d.staff_id = s.id ORDER BY d.sequence DESC LIMIT " +this.page.limit+ " OFFSET " + (pageInfo.offset * this.page.limit), []).then((disrs: any) => {
         let array = []
         console.log("DISRS", disrs)
         for (let x in disrs) {
