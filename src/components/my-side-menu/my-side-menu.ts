@@ -1,8 +1,9 @@
 import { MyFunctionProvider } from './../../providers/my-function/my-function';
 import { Events, App } from 'ionic-angular';
 import { Component, ViewEncapsulation } from '@angular/core';
-import {animate, AUTO_STYLE, state, style, transition, trigger} from '@angular/animations';
+import { animate, AUTO_STYLE, state, style, transition, trigger } from '@angular/animations';
 import { MenuItems } from './../../shared/menu-items/menu-items';
+/* import { AppUpdate } from '@ionic-native/app-update'; */
 
 /**
  * Generated class for the MySideMenuComponent component.
@@ -10,6 +11,9 @@ import { MenuItems } from './../../shared/menu-items/menu-items';
  * See https://angular.io/api/core/Component for more info on Angular
  * Components.
  */
+declare var window
+declare var cordova
+
 @Component({
   selector: 'my-side-menu',
   templateUrl: 'my-side-menu.html',
@@ -32,12 +36,12 @@ import { MenuItems } from './../../shared/menu-items/menu-items';
     ]),
     trigger('fadeInOutTranslate', [
       transition(':enter', [
-        style({opacity: 0}),
-        animate('400ms ease-in-out', style({opacity: 1}))
+        style({ opacity: 0 }),
+        animate('400ms ease-in-out', style({ opacity: 1 }))
       ]),
       transition(':leave', [
-        style({transform: 'translate(0)'}),
-        animate('400ms easein-out', style({opacity: 0}))
+        style({ transform: 'translate(0)' }),
+        animate('400ms easein-out', style({ opacity: 0 }))
       ])
     ])
   ],
@@ -83,16 +87,18 @@ export class MySideMenuComponent {
     public menuItems: MenuItems,
     public events: Events,
     public myFunctionProvider: MyFunctionProvider,
-    public app: App
+    public app: App/* ,
+    private appUpdate: AppUpdate */
   ) {
+
     let myMenu = this.menuItems.getAll()
     this.myMenu = myMenu
     console.log("myMenu", myMenu)
 
     this.myFunctionProvider.dbQuery("SELECT id, name FROM product_categories ORDER BY sequence", []).then((data: any) => {
       let cat = []
-      for(let x in data){
-        cat.push({badge: [{type: "warning", value: 10}], state: "ProductCategoryPage", name: data[x].name, data: {name: data[x].name, id: data[x].id}})
+      for (let x in data) {
+        cat.push({ /* badge: [{ type: "warning", value: 10 }], */ state: "ProductCategoryPage", name: data[x].name, data: { name: data[x].name, id: data[x].id } })
       }
       console.log("Categories", cat)
       this.myMenu[0].main[0].children = cat
@@ -104,7 +110,7 @@ export class MySideMenuComponent {
 
     events.subscribe('menu:opened', () => {
       // your action here
-  });
+    });
 
     this.navType = 'st2';
     this.themeLayout = 'vertical';
@@ -138,11 +144,23 @@ export class MySideMenuComponent {
     this.loadIt(this.myFunctionProvider.settings)
   }
 
-  loadIt(settings){
-    this.myFunctionProvider.dbQuery("SELECT staffs.*, roles.name AS role_name FROM staffs, roles WHERE staffs.id = ? AND roles.id = staffs.role_id", [settings.logged_staff]).then((staff: any) => {
+  loadIt(settings) {
+    this.myFunctionProvider.dbQuery("SELECT staffs.*, roles.name AS role_name, staffs.thumbnail FROM staffs, roles WHERE staffs.id = ? AND roles.id = staffs.role_id", [settings.logged_staff]).then((staff: any) => {
       console.log("Logged User", staff)
       this.staff = staff[0]
     })
+  }
+
+  checkUpdates() {
+    let updateUrl = 'https://www.dropbox.com/s/u789jjiowrji0cn/baristachoi_version.xml?dl=1';
+    let self = this
+    //AppUpdate.checkAppUpdate(updateUrl);
+    window.AppUpdate.checkAppUpdate((c) => { self.myFunctionProvider.presentToast(c.msg, "") }, (c) => { self.myFunctionProvider.presentToast(c.msg, "") }, updateUrl);
+    /* this.myFunctionProvider.spinner(true, "Checking...")
+    const updateUrl = 'https://www.dropbox.com/s/u789jjiowrji0cn/baristachoi_version.xml?dl=1';
+    this.appUpdate.checkAppUpdate(updateUrl).then(() => { console.log('Update available'); this.myFunctionProvider.spinner(false, "") }).catch(() => {
+      this.myFunctionProvider.spinner(false, "")
+    }) */
   }
 
   onResize(event) {
@@ -181,18 +199,34 @@ export class MySideMenuComponent {
     this.isCollapsedSideBar = this.isCollapsedSideBar === 'yes-block' ? 'no-block' : 'yes-block';
   }
 
-  clickFunction(item){
+  clickFunction(item) {
     console.log(item)
+    this.myFunctionProvider.spinner(true, "Please wait")
+    console.log("stack: ", this.myFunctionProvider.nav.length())
+
     if (typeof item.data !== "undefined") {
       this.myFunctionProvider.menuCtrl.close()
-      this.myFunctionProvider.nav.push("ProductCategoryPage", item.data);
-    }else{
+      this.myFunctionProvider.nav.push("ProductCategoryPage", item.data)
+    } else {
       this.myFunctionProvider.menuCtrl.close()
-      this.myFunctionProvider.nav.push(item.state, (typeof item.data !== "undefined") ? item.data : {})
+      if (this.myFunctionProvider.nav.length() > 1) {
+        this.myFunctionProvider.nav.setRoot("HomePage").then(() => {
+          this.myFunctionProvider.spinner(true, "Please wait")
+          this.myFunctionProvider.nav.push(item.state, (typeof item.data !== "undefined") ? item.data : {})
+        })
+      } else {
+        this.myFunctionProvider.nav.push(item.state, (typeof item.data !== "undefined") ? item.data : {})
+      }
     }
   }
 
-  logout(){
+  openSettings() {
+    this.myFunctionProvider.menuCtrl.close()
+    this.myFunctionProvider.spinner(true, "Please wait")
+    this.myFunctionProvider.nav.push("SettingsPage")
+  }
+
+  logout() {
     this.events.publish("staff:logout")
   }
 

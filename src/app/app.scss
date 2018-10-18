@@ -19,6 +19,25 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 0px !important
 }
 
+.numKilos{
+  font-size: large;
+  font-weight: bolder;
+  color: map-get($colors, primary)
+}
+
+.unitName{
+  font-size: 1rem !important;
+  font-style: italic
+}
+
+.rightItem{
+  text-align: right;
+  border: 1px solid map-get($colors, primary);
+  padding: 4px;
+  border-radius: 5px;
+  background-color: #f3efe9;
+}
+
 .fl{ float: left;}
 
 .fr{float: right;}
@@ -33,6 +52,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .content-md{
   background-color: map-get($colors, primary) !important
+}
+
+ion-card-header.card-header{
+  padding: 16px !important;
+  text-align: center !important;
+    background: map-get($colors, secondary) !important;
+    color: #222 !important;
+    font-weight: bolder !important;
 }
 
 ion-label.label-md{
@@ -84,7 +111,24 @@ ion-label.label-md{
   background-color: #93be52
 }
 
-.itemDivider:not(:last-child){border-bottom: 1px dashed map-get($colors, primary)}
+.itemDivider:not(:last-child){border-bottom: 1px solid map-get($colors, primary)}
+
+formio{
+  padding: 1em
+}
+
+.formio-component-file .fileSelector{
+  padding: 5px
+}
+
+.formio-component-file .fileSelector button {
+  margin: 2px
+}
+
+.help-block{
+  font-size: x-small;
+  color: grey;
+}
 
 //fixes bootstrap to ionic
 .item-md .label{
@@ -105,7 +149,60 @@ button:focus{
 
 .myItems {border-bottom: 1px dashed map-get($colors, primary);}
 
+fieldset.form-group{
+  border: solid 1px map-get($colors, secondary) !important;
+    padding: 0 10px 10px 10px;
+    border-bottom: none;
+    border-radius: 5px
+}
+
+fieldset.form-group legend {
+  width: auto !important;
+    border: none;
+    font-size: 14px;
+}
+
 //datatable
 .datatable-row-wrapper:not(:first-child){
   margin-top: 1em
+}
+
+//modal
+/* ion-modal,
+  .show-page {
+    // transparent black background overlay
+    background-color: rgba(0, 0, 0, 0) !important;
+    padding: 50px !important;
+  }
+  .toolbar-background {
+    color: red !important;
+  }
+  ion-modal.modal-wrapper {
+    transform: translateY(30%) !important;
+  }
+  ion-page.modal {
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .modal-backdrop-bg {
+    background-color: #000;
+    opacity: 0;
+  }
+  .active .modal-backdrop-bg {
+    opacity: 0.5;
+  }
+
+ion-modal.inset-modal {
+  // transparent black background overlay
+  background-color: rgba(0, 0, 0, .5) !important;
+  transition: opacity .25s ease-in-out;
+  padding: 20vh 10vw;
+} */
+
+.round {
+  border-radius: 10px;
+}
+
+.formio-component-selectboxes span {
+  margin-left: 10px
 }

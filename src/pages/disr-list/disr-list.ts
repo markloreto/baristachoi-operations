@@ -36,6 +36,7 @@ export class DisrListPage {
     public myFunctionProvider: MyFunctionProvider,
     public actionSheetCtrl: ActionSheetController
   ) {
+    this.myFunctionProvider.spinner(true, "Please wait")
     this.myFunctionProvider.dbQuery("SELECT * FROM disrs", []).then((disrs: any) => {
       console.log("DISRS", disrs)
     })
@@ -61,6 +62,7 @@ export class DisrListPage {
           array.push({ staff_id: disrs[x].staff_id, thumbnail: (disrs[x].thumbnail) ? this.myFunctionProvider.sanitize(disrs[x].thumbnail) : "assets/images/bc5.jpg", sequence: disrs[x].sequence, id: disrs[x].id, created_date: moment(disrs[x].created_date, "YYYY-MM-DD HH:mm:ss").format("LL"), release_by: disrs[x].staff_name, dealer: disrs[x].dealer, dealer_id: disrs[x].dealer_id })
         }
         this.rows = [...array]
+
         this.myFunctionProvider.spinner(false, "")
       })
     })
@@ -75,16 +77,16 @@ export class DisrListPage {
         text: 'Edit',
         icon: 'create',
         handler: () => {
-          this.myFunctionProvider.nav.push("DisrCreatePage", { sequence: s.sequence, staff_id: s.staff_id, id: s.id, dealer: { id: s.dealer_id, name: s.dealer, thumbnail: this.myFunctionProvider.sanitize(s.thumbnail) } })
+          this.myFunctionProvider.nav.push("DisrCreatePage", { staff_name: s.release_by, sequence: s.sequence, staff_id: s.staff_id, id: s.id, dealer: { id: s.dealer_id, name: s.dealer, thumbnail: this.myFunctionProvider.sanitize(s.thumbnail) } })
         }
       })
 
-      buttons.push({
+      /* buttons.push({
         icon: 'trash',
         text: 'Delete',
         role: 'destructive',
         handler: () => {
-          /* this.myFunctionProvider.toastConfirm("DR # " + s.dr, "Delete?", "fa fa-trash").then((b: any) => {
+          this.myFunctionProvider.toastConfirm("DR # " + s.dr, "Delete?", "fa fa-trash").then((b: any) => {
             if(b){
               //todo
               this.myFunctionProvider.spinner(true, "Removing from database")
@@ -106,9 +108,9 @@ export class DisrListPage {
                 })
               })
             }
-          }) */
+          })
         }
-      })
+      }) */
     }
 
     buttons.push({
@@ -139,14 +141,16 @@ export class DisrListPage {
   }
 
   add() {
+
     this.myFunctionProvider.dbQuery("SELECT id, name, thumbnail FROM staffs WHERE role_id = ?", [3]).then((staffs: any) => {
       console.log("dealers", staffs)
       for (let x in staffs) {
         staffs[x].thumbnail = (staffs[x].thumbnail) ? this.myFunctionProvider.sanitize(staffs[x].thumbnail) : "assets/images/bc5.jpg"
       }
-      let m = this.modalCtrl.create("DealersListPage", { staffs: staffs });
+      let m = this.modalCtrl.create("DealersListPage", { staffs: staffs }, { cssClass: 'inset-modal' });
       m.onDidDismiss(staff => {
         console.log(staff.id)
+        this.myFunctionProvider.spinner(true, "Please wait")
         this.navCtrl.push("DisrCreatePage", { dealer: staff })
       })
 
@@ -168,6 +172,9 @@ export class DisrListPage {
 
   menuBtn(e){
     console.log(e)
+    if(e.title === "New DISR"){
+      this.add()
+    }
   }
 
 }

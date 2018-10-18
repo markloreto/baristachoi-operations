@@ -53,6 +53,7 @@ export class AddDrPage {
     public formBuilder: FormBuilder,
     public modalCtrl: ModalController,
   ) {
+    this.myFunctionProvider.spinner(false, "")
     this.staff_id = parseInt(this.myFunctionProvider.settings.logged_staff)
     this.myForm = formBuilder.group({
       date: [moment().format("YYYY-MM-DD"), Validators.required],
@@ -60,7 +61,7 @@ export class AddDrPage {
       notes: [""]
     });
 
-    this.myFunctionProvider.dbQuery("SELECT p.id AS product_id, p.cost AS product_cost, p.price AS product_price, p.sku AS product_sku, p.thumbnail AS product_thumbnail, p.name AS product_name, pc.name AS category_name, mu.abbr AS abbr FROM products p INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id", []).then((products: any) => {
+    this.myFunctionProvider.getProducts().then((products: any) => {
       let grouped = _.chain(products)
         .groupBy('category_name')
         .map((items, category) => ({ items, category }))
@@ -139,6 +140,19 @@ export class AddDrPage {
 
   }
 
+  menuBtn(e){
+    console.log(e)
+    if(e.title === "Add Photo From Camera"){
+      this.addFromCamera()
+    }
+    if(e.title === "Add Photo From Filemanager"){
+      this.addFromFile()
+    }
+    if(e.title === "Import Products"){
+      this.addItem()
+    }
+  }
+
   ionViewDidLoad() {
     console.log('ionViewDidLoad AddDrPage');
   }
@@ -148,6 +162,7 @@ export class AddDrPage {
   }
 
   addFromCamera() {
+    this.segment = "photos"
     this.myFunctionProvider.takePicture().then((photoData: any) => {
       console.log("Photo Data", photoData)
       this.photos.push({ id: null, b64: photoData.photo, b64_preview: photoData.thumbnail })
@@ -155,6 +170,7 @@ export class AddDrPage {
   }
 
   addFromFile() {
+    this.segment = "photos"
     this.myFunctionProvider.fileChooser.open().then(uri => {
       this.myFunctionProvider.imageProcess(uri).then((photoData: any) => {
         this.photos.push({ id: null, b64: photoData.photo, b64_preview: photoData.thumbnail })
@@ -309,7 +325,7 @@ export class AddDrPage {
       }
     }
 
-    let t = this.myFunctionProvider.getTimestamp()
+    let t = parseInt(this.myFunctionProvider.getTimestamp())
     let k = parseInt(this.myFunctionProvider.getTimestamp())
     let arr = []
     console.log(this.rows)
@@ -330,14 +346,14 @@ export class AddDrPage {
       this.myFunctionProvider.spinner(true, "Please wait")
       //this.myFunctionProvider.dbQuery("INSERT OR REPLACE INTO delivery_receipts (id, dr, created_date, notes, sync, staff_id) VALUES (?, ?, ?, ?, ?, ?)", [t, fc.dr.value, fc.date.value + " 00:00:00", fc.notes.value, null, this.staff_id]).then(() => {
       if (this.id)
-        arr.push(["UPDATE delivery_receipts SET dr = ?, created_date = ?, notes = ?, sync = ?, staff_id = ? WHERE id = ?", [fc.dr.value, fc.date.value + " 00:00:00", fc.notes.value, (this.sync == null) ? null : 3, this.staff_id, this.id]])
+        arr.push(["UPDATE delivery_receipts SET dr = ?, created_date = ?, notes = ?, sync = ?, staff_id = ? WHERE id = ?", [fc.dr.value, fc.date.value + " 00:00:00", fc.notes.value, null, this.staff_id, this.id]])
       else
         arr.push(["INSERT OR REPLACE INTO delivery_receipts (id, dr, created_date, notes, sync, staff_id, depot_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [t, fc.dr.value, fc.date.value + " 00:00:00", fc.notes.value, null, this.staff_id, this.myFunctionProvider.settings.depot.id]])
 
       for (let x in this.rows) {
         if (this.rows[x].qty) {
           if(_.some(this.pids, { table: "inventories", ref: this.rows[x].id}))
-            arr.push(["UPDATE inventories SET qty = ?, price = ?, cost = ?, type = ?, sync = ?, staff_id = ? WHERE reference_id = ? AND module_id = ? AND product_id = ?", [this.rows[x].qty, this.rows[x].price, this.rows[x].cost, 1, 3, this.staff_id, this.id, 1, this.rows[x].id]])
+            arr.push(["UPDATE inventories SET qty = ?, price = ?, cost = ?, type = ?, sync = ?, staff_id = ? WHERE reference_id = ? AND module_id = ? AND product_id = ?", [this.rows[x].qty, this.rows[x].price, this.rows[x].cost, 1, null, this.staff_id, this.id, 1, this.rows[x].id]])
           else
             arr.push(["INSERT OR REPLACE INTO inventories (id, product_id, qty, price, cost, module_id, reference_id, type, sync, staff_id, depot_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [k, this.rows[x].id, this.rows[x].qty, this.rows[x].price, this.rows[x].cost, 1, (this.id) ? this.id : t, 1, null, this.staff_id, this.myFunctionProvider.settings.depot.id]])
           k++
@@ -350,7 +366,7 @@ export class AddDrPage {
       //this.myFunctionProvider.dbQueryBatch(arr).then(() => {
       for (let x in this.photos) {
         if(_.some(this.pids, { table: "attachments", ref: this.photos[x].id}))
-          arr.push(["UPDATE attachments SET staff_id = ?, b64 = ?, b64_preview = ?, sync = ? WHERE id = ?", [this.staff_id, this.photos[x].b64, this.photos[x].b64_preview, 3, this.photos[x].id]])
+          arr.push(["UPDATE attachments SET staff_id = ?, b64 = ?, b64_preview = ?, sync = ? WHERE id = ?", [this.staff_id, this.photos[x].b64, this.photos[x].b64_preview, null, this.photos[x].id]])
         else
           arr.push(["INSERT OR REPLACE INTO attachments VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [s, this.staff_id, 1, (this.id) ? this.id : t, this.photos[x].b64, this.photos[x].b64_preview, this.myFunctionProvider.settings.depot.id, null]])
         s++
@@ -370,6 +386,7 @@ export class AddDrPage {
       }
 
       this.myFunctionProvider.dbQueryBatch(arr).then(() => {
+        this.myFunctionProvider.scanUpdates(["attachments", "inventories", "delivery_receipts"])
         if (this.id) {
           this.myFunctionProvider.deleteSync(this.deletes).then(() => {
             this.myFunctionProvider.spinner(false, "Please wait")

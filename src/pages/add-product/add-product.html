@@ -5,7 +5,7 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-  <my-header title="Add new product" headerColor="primary" [menuEnable]="true"></my-header>
+  <my-header [title]="title" headerColor="primary" [menuEnable]="true"></my-header>
   <ion-toolbar>
     <ion-segment [(ngModel)]="segment">
       <ion-segment-button value="details">
@@ -36,7 +36,7 @@
           </ion-item>
           <ion-item>
             <ion-label>SKU</ion-label>
-            <ion-input type="number" placeholder="Leave blank to auto generate" formControlName="sku"></ion-input>
+            <ion-input type="text" placeholder="Leave blank to auto generate" formControlName="sku"></ion-input>
           </ion-item>
           <ion-item [class.border-danger]="isValid('cost')">
             <ion-label>Cost</ion-label>
@@ -97,6 +97,10 @@
       <ion-item>
         <ion-label>Shared</ion-label>
         <ion-toggle [(ngModel)]="shared"></ion-toggle>
+      </ion-item>
+      <ion-item>
+        <ion-label>Starred</ion-label>
+        <ion-toggle [(ngModel)]="starred"></ion-toggle>
       </ion-item>
     </ion-list>
   </div>

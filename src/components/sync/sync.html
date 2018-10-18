@@ -1,0 +1,28 @@
+<!-- Generated template for the SyncComponent component -->
+<div class="col-md-6 col-xl-3" style="margin-top: 2em">
+  <div class="card widget-card-1">
+    <div class="card-block-small">
+      <i class="icofont icofont-cloud-refresh bg-c-yellow card1-icon"></i>
+      <span class="text-c-yellow f-w-600">Last Successfull Sync</span>
+      <h4>{{lastSync}}</h4>
+      <div>
+        <span class="f-left m-t-10 text-muted">
+          <i class="text-c-yellow f-16 icofont icofont-refresh m-r-10"></i>{{(lastSync) ? diffDays() : 'No Successful Sync Yet, Give it a try!'}}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+<ion-card>
+  <ion-list>
+    <ion-item *ngFor="let progressBar of progressBars.slice().reverse()">
+      <ion-icon style="font-size: 3em !important" [name]="progressBar.icon" item-start color="primary"></ion-icon>
+      <div>
+        <div style="text-align: center">
+          {{progressBar.table}}
+        </div>
+        <progress-bar [progress]="progressBar.percent" [color-degraded]="{'0': '#86E4AE',  '10': '#7EE2A8', '20': '#76e0a3', '30': '#6dde9d', '40': '#65dc98', '50': '#5dda92', '60': '#54d98c', '70': '#4cd787', '80': '#44d581', '90': '#3bd37c', '100': '#33d176'}"></progress-bar>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-card>

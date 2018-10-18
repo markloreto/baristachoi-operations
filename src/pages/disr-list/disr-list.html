@@ -5,9 +5,8 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-  <my-header title="DISR List" headerColor="primary" [menuEnable]="true"></my-header>
+  <my-header title="D.I.S.R. List" headerColor="primary" [menuEnable]="false"></my-header>
 </ion-header>
-
 
 <ion-content>
   <ion-card>
@@ -25,10 +24,5 @@
     </ngx-datatable>
 
   </ion-card>
-  <ion-fab top right edge>
-    <button ion-fab mini color="secondary" (click)="add()">
-      <ion-icon name="add"></ion-icon>
-    </button>
-  </ion-fab>
-  <popup-menu (btnPush)="menuBtn($event)" [btns]='[{title: "filter", icon: "funnel", badge: false}]'></popup-menu>
+  <popup-menu (btnPush)="menuBtn($event)" [btns]='[{title: "New DISR", icon: "add", badge: false}, {title: "filter", icon: "funnel", badge: false}]'></popup-menu>
 </ion-content>

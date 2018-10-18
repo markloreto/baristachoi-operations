@@ -29,7 +29,7 @@ Kilometer reading end
 </ion-header>
 
 
-<ion-content>
+<ion-content style="overflow-y: hidden;">
   <div [ngSwitch]="segment" class="mb5em">
     <form [formGroup]="myForm" *ngSwitchCase="'details'">
       <ion-card>
@@ -44,51 +44,35 @@ Kilometer reading end
             # {{sequence}}
           </span>
         </ion-item>
-        <ngx-qrcode [qrc-value]="qrValue" [qrc-version]="10" [qrc-correction-level]="'L'" [elementType]="'img'" *ngIf="id"></ngx-qrcode>
+        <ion-item>
+          <ion-icon name="speedometer" item-start></ion-icon>
+          Total Kilometers
+          <ion-note item-end>
+            {{myFunctionProvider.addS(kmTotal, "Kilometer")}}
+          </ion-note>
+        </ion-item>
         <ion-row>
           <ion-col>
-            <button ion-button icon-start clear small block [disabled]="!prev" (click)="goTo(prev)">
+            <button ion-button icon-start clear small block [disabled]="!prev.seq" (click)="goTo(prev)">
               <ion-icon name="arrow-dropleft-circle"></ion-icon>
-              <div>{{(prev) ? "Sequence # " + prev : ""}}</div>
+              <div>{{(prev.seq) ? "Sequence # " + prev.seq : ""}}</div>
             </button>
           </ion-col>
           <ion-col style="text-align: right">
-            <button ion-button icon-end clear small block [disabled]="!next" (click)="goTo(next)">
-              <div>{{(next) ? "Sequence # " + next : ""}}</div>
+            <button ion-button icon-end clear small block [disabled]="!next.seq" (click)="goTo(next)">
+              <div>{{(next.seq) ? "Sequence # " + next.seq : ""}}</div>
               <ion-icon name="arrow-dropright-circle"></ion-icon>
             </button>
           </ion-col>
         </ion-row>
       </ion-card>
-      <ion-card>
-        <div class="card widget-card-user">
-          <div class="card-block p-b-0">
-            <div class="card-user">
-              <img [src]="dealer.thumbnail" alt="" class="text-right">
-              <span class="label bg-c-blue card-bedges">{{(id) ? "MODIFICATION" : "NEW"}}</span>
-              <h4 class="p-t-10 p-b-10 m-t-0">{{dealer.name}}</h4>
-              <span class="text-c-green f-14">California USA</span>
-            </div>
-          </div>
-          <div class="card-footer b-t-default">
-            <div class="row">
-              <div class="col-sm-4 footer-menu text-center">
-                <p class="text-muted f-w-400 m-0 f-16">Sequence #</p>
-                <span class="f-14 f-w-400">{{sequence}}</span>
-              </div>
-              <div class="col-sm-4 footer-menu text-center">
-                <p class="text-muted f-w-400 m-0 f-16">Total Kilometers</p>
-                <span class="f-14 f-w-400">{{kmTotal}}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ion-card>
+
       <ion-card>
         <ion-list>
           <ion-item class="myItems">
             <ion-label>Date</ion-label>
-            <ion-datetime displayFormat="MMMM DD, YYYY hh:mm A" pickerFormat="MMMM DD YYYY hh:mm A" formControlName="date" (ionChange)="changeDate()"></ion-datetime>
+            <ion-datetime displayFormat="MMMM DD, YYYY hh:mm A" pickerFormat="MMMM DD YYYY hh:mm A" formControlName="date"
+              (ionChange)="changeDate()"></ion-datetime>
           </ion-item>
 
           <ion-item [class.border-danger]="isValid('km_start')">
@@ -107,35 +91,36 @@ Kilometer reading end
       <ion-card>
 
         <ion-item [class.border-danger]="isValid('notes')" class="myItems">
-          <ion-textarea formControlName="notes" name="notes" autocomplete="on" autocorrect="on" placeholder="Notes" rows="7"></ion-textarea>
+          <ion-textarea formControlName="notes" name="notes" autocomplete="on" autocorrect="on" placeholder="Notes"
+            rows="7"></ion-textarea>
         </ion-item>
+      </ion-card>
+
+      <ion-card *ngIf="id">
+        <ion-card-header>
+          Load
+        </ion-card-header>
+        <ngx-qrcode [qrc-value]="qrValue" [qrc-version]="10" [qrc-correction-level]="'L'" [elementType]="'img'" *ngIf="id"></ngx-qrcode>
       </ion-card>
     </form>
     <div *ngSwitchCase="'items'">
+
       <ion-card>
-        <ion-fab top right *ngIf="(segment === 'items')">
-          <button ion-fab color="tertiary" mini (click)="addItem()">
-            <ion-icon name="list-box"></ion-icon>
-          </button>
-        </ion-fab>
-        <ion-item>
-          <h2>Sequence # </h2>
-          <p>{{myForm.controls["date"].value}}</p>
-        </ion-item>
-        <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable" [scrollbarH]="true" [columnMode]="'force'"
-          [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [selectionType]="'single'" (activate)="onActivate($event)"
-          (select)='onSelect($event)' [footerHeight]="50" [rowHeight]="'auto'" (tableContextmenu)="onTableContextMenu($event)"
-          [sorts]="[{prop: 'sequence', dir: 'asc'}]">
+        <ngx-datatable #myTable [rows]="rows" [columns]="columns" class="material expandable" [scrollbarH]="true"
+          [columnMode]="'standard'" [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected"
+          [selectionType]="'single'" (activate)="onActivate($event)" (select)='onSelect($event)' [footerHeight]="50"
+          [rowHeight]="'auto'" (tableContextmenu)="onTableContextMenu($event)" [sorts]="[{prop: 'sequence', dir: 'asc'}]">
 
           <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
             <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
               <div style="padding-left:5px;">
-                <b>{{group.key}}:</b> {{sumIt(group)}}
+                <b>{{group.key}}</b>
               </div>
             </ng-template>
           </ngx-datatable-group-header>
 
-          <ngx-datatable-column name='Product Name' prop="name" [flexGrow]="3" [minWidth]="180" [frozenLeft]="true" [width]="180">
+          <ngx-datatable-column name='Product Name' prop="name" [flexGrow]="2" [minWidth]="180" [frozenLeft]="true"
+            [width]="180">
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
               <div style="display: contents">
                 <i *ngIf="row.remaining !== ''" class="fa fa-check-square-o" style="color: green"></i>
@@ -143,51 +128,51 @@ Kilometer reading end
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="previous" name="Previous Unsold" [flexGrow]="3" [minWidth]="140" [width]="140">
+          <ngx-datatable-column prop="previous" name="Previous Unsold" [flexGrow]="1" [minWidth]="120" [width]="120">
             <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
               {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="load" name="Load" [flexGrow]="3" [minWidth]="140" [width]="140">
+          <ngx-datatable-column prop="load" name="Load" [flexGrow]="1" [minWidth]="120" [width]="120">
             <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
               {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="total" name="Total Stock" [flexGrow]="3" [minWidth]="140" [width]="140">
+          <ngx-datatable-column prop="total" name="Overall Stock" [flexGrow]="1" [minWidth]="120" [width]="120">
             <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
               {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="remaining" name="Remaining Stock" [flexGrow]="3" [minWidth]="140" [width]="140">
+          <ngx-datatable-column prop="remaining" name="Remaining Stock" [flexGrow]="1" [minWidth]="120" [width]="120">
             <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
               {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="sold" [flexGrow]="3" [minWidth]="140" [width]="140">
+          <ngx-datatable-column prop="sold" [flexGrow]="1" [minWidth]="120" [width]="120">
             <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
               {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="price" [flexGrow]="3" [minWidth]="140" [width]="140">
+          <ngx-datatable-column prop="price" [flexGrow]="1" [minWidth]="120" [width]="120">
             <ng-template let-value="value" ngx-datatable-cell-template>
               ₱ {{value | number:'.2-2'}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="amount" [flexGrow]="3" [minWidth]="140" [width]="140">
+          <ngx-datatable-column prop="amount" [flexGrow]="1" [minWidth]="120" [width]="120">
             <ng-template let-value="value" ngx-datatable-cell-template>
               {{(value==="") ? "Unset" : "₱ " + (value | number:'.2-2')}}
             </ng-template>
           </ngx-datatable-column>
 
           <ngx-datatable-footer>
-            <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize" let-selectedCount="selectedCount"
-              let-curPage="curPage" let-offset="offset">
+            <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+              let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset">
               <div style="padding: 5px 10px; width: 100%; text-align: right; font-size: medium">
                 <div>
                   <strong>Grand Total</strong>: ₱ {{grandTotal | number:'.2-2'}}
@@ -197,11 +182,572 @@ Kilometer reading end
           </ngx-datatable-footer>
         </ngx-datatable>
       </ion-card>
+      <ng-container *ngFor="let cat of products">
+        <ion-card class="card online-form" *ngIf="cat.items.length > 1">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h5>{{cat.category}} Summary</h5>
+            </div>
+            <div class="card-header-right">
+              <i class="icofont icofont-spinner-alt-5"></i>
+            </div>
+          </div>
+          <div class="card-block">
+            <h2 class="text-center f-w-400">{{getSummaries(cat.category, 'total')}}</h2>
+            <p class="text-center text-muted m-b-10">Overall Stock</p>
+            <div class="b-t-default m-t-5 p-t-10">
+              <div class="row">
+                <div class="col-sm m-t-5 text-center">
+                  <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'previous')}}</span>
+                  <p class="text-muted m-b-0">Previous Unsold</p>
+                </div>
+                <div class="col-sm m-t-5 text-center">
+                  <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'load')}}</span>
+                  <p class="text-muted m-b-0">Load</p>
+                </div>
+                <div class="col-sm m-t-5 text-center">
+                  <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'remaining')}}</span>
+                  <p class="text-muted m-b-0">Remaining</p>
+                </div>
+                <div class="col-sm m-t-5 text-center">
+                  <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'sold')}}</span>
+                  <p class="text-muted m-b-0">Sold</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-card>
+      </ng-container>
+
+      <!-- <ion-card>
+        <chart [type]="chart.type" [data]="chart.data" [options]="chart.options"></chart>
+      </ion-card> -->
+    </div>
+    <div *ngIf="printing">
+      <ion-scroll scrollY="true" scrollX="true" style="width:100vw; height:768px; background: white" zoom="true">
+        <div [ngClass]="{'scroll-container-rso': printRSO, 'scroll-container-disr': !printRSO}" #forPrint>
+          <div *ngIf='!printRSO'>
+            <div>
+              <div class="card" style='width: 1175px'>
+                <ion-grid>
+                  <ion-row class="invoice-contact">
+                    <ion-col col-8>
+                      <table class="table table-responsive invoice-table table-borderless">
+                        <tbody>
+                          <tr>
+                            <td><img src="assets/images/logo_header.png" class="m-b-10" alt="" width='150'></td>
+                          </tr>
+                          <tr>
+                            <td>{{myFunctionProvider.settings.depot.name}}</td>
+                          </tr>
+                          <tr>
+                            <td>{{myFunctionProvider.settings.depot.province}},
+                              {{myFunctionProvider.settings.depot.municipal}},
+                              {{myFunctionProvider.settings.depot.brgy}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </ion-col>
+                    <ion-col col-4>
+                      <div style='font-size: 46px; font-weight: bold; text-align: right; margin-right: 20px'># {{sequence}}</div>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row class="card-body">
+                    <ion-col>
+                      <h6>Information :</h6>
+                      <table class="table table-responsive invoice-table invoice-order table-borderless" style="font-size: large">
+                        <tbody>
+                          <tr>
+                            <th>Name :</th>
+                            <td>{{dealer.name}}</td>
+                          </tr>
+                          <tr>
+                            <th>Date :</th>
+                            <td>{{readableDate("date")}}</td>
+                          </tr>
+                          <tr>
+                            <th>Status :</th>
+                            <td>
+                              <span class="label label-warning">Pending</span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </ion-col>
+                    <ion-col>
+                      <h6 class="m-b-20">DISR Sequence # <span>{{sequence}}</span></h6>
+                      <h4 class="text-uppercase text-primary">Total Due :
+                        <span>₱ {{grandTotal | number:'.2-2'}}</span>
+                      </h4>
+                    </ion-col>
+                    <ion-col>
+                      <h6>Notes :</h6>
+                      <div>
+                        {{myForm.get('notes').value}}
+                      </div>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+                <div class="card-body">
+
+
+                  <ngx-datatable [rows]="rows" [columns]="columns" class="material" [columnMode]="'force'"
+                    [groupRowsBy]="'category'" [groupExpansionDefault]="true" [selected]="selected" [footerHeight]="50"
+                    [rowHeight]="'auto'" [sorts]="[{prop: 'sequence', dir: 'asc'}]">
+
+                    <ngx-datatable-group-header [rowHeight]="50">
+                      <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
+                        <div style="padding-left:5px;">
+                          <b>{{group.key}}</b>
+                        </div>
+                      </ng-template>
+                    </ngx-datatable-group-header>
+
+                    <ngx-datatable-column name='Product Name' prop="name" [flexGrow]="2" [minWidth]="180" [width]="180">
+                      <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                        <div style="display: contents">
+                          <i *ngIf="row.remaining !== ''" class="fa fa-check-square-o" style="color: green"></i>
+                          <i *ngIf="row.remaining === ''" class="fa fa-warning" style="color: darkgoldenrod"></i>
+                          {{value}}</div>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="previous" name="Previous Unsold">
+                      <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+                        {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="load" name="Load">
+                      <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+                        {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="total" name="Overall Stock">
+                      <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+                        {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="remaining" name="Remaining Stock">
+                      <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+                        {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="sold">
+                      <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+                        {{(value==="") ? "Unset" : myFunctionProvider.addS(value, row.abbr)}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="price">
+                      <ng-template let-value="value" ngx-datatable-cell-template>
+                        ₱ {{value | number:'.2-2'}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="amount">
+                      <ng-template let-value="value" ngx-datatable-cell-template>
+                        {{(value==="") ? "Unset" : "₱ " + (value | number:'.2-2')}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-footer>
+                      <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+                        let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset">
+                        <div style="padding: 5px 10px; width: 100%; text-align: right; font-size: medium">
+                          <div>
+                            <strong>Grand Total</strong>: ₱ {{grandTotal | number:'.2-2'}}
+                          </div>
+                        </div>
+                      </ng-template>
+                    </ngx-datatable-footer>
+                  </ngx-datatable>
+
+
+                  <ng-container *ngFor="let cat of products">
+                    <ion-card class="card online-form" *ngIf="cat.items.length > 1">
+                      <div class="card-header">
+                        <div class="card-header-left">
+                          <h5>{{cat.category}} Summary</h5>
+                        </div>
+                        <div class="card-header-right">
+                          <i class="icofont icofont-spinner-alt-5"></i>
+                        </div>
+                      </div>
+                      <div class="card-block">
+                        <h2 class="text-center f-w-400">{{getSummaries(cat.category, 'total')}}</h2>
+                        <p class="text-center text-muted m-b-10">Overall Stock</p>
+                        <div class="b-t-default m-t-5 p-t-10">
+                          <div class="row">
+                            <div class="col m-t-5 text-center">
+                              <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'previous')}}</span>
+                              <p class="text-muted m-b-0">Previous Unsold</p>
+                            </div>
+                            <div class="col m-t-5 text-center">
+                              <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'load')}}</span>
+                              <p class="text-muted m-b-0">Load</p>
+                            </div>
+                            <div class="col m-t-5 text-center">
+                              <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'remaining')}}</span>
+                              <p class="text-muted m-b-0">Remaining</p>
+                            </div>
+                            <div class="col m-t-5 text-center">
+                              <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'sold')}}</span>
+                              <p class="text-muted m-b-0">Sold</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </ion-card>
+                  </ng-container>
+                  <ion-grid>
+                    <ion-row style="margin-top: 80px">
+                      <ion-col>
+                        <ul class="list list-unstyled text-right f-left">
+                          <li></li>
+                          <li>{{dealer.name}}<br /><span class="text-semibold">ACKNOWLEDGE BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-left receivedBy">
+                          <li></li>
+                          <li>_______________________<br /><span class="text-semibold">ACKNOWLEDGE BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-right">
+                          <li></li>
+                          <li>{{released_by}}<br /><span class="text-semibold">CHECKED BY</span></li>
+                        </ul>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf='printRSO'>
+            <div *ngIf="printView == 'RSO - Depot'">
+              <div class="card card-border-primary" style="width: 720px">
+                <div class="card-header">
+                  <div class="media">
+                    <div class="media-left media-middle photo-table">
+                      <a href="#">
+                        <img class="media-object img-radius" src="assets/images/no-pic.png" alt="Generic placeholder image">
+                        <div class="live-status2 bg-success"></div>
+                      </a>
+                    </div>
+                    <div class="media-body">
+                      <h6>{{dealer.name}}</h6>
+                      <p>Dealer</p>
+                    </div>
+                    <img alt="logo" height="40" src="assets/images/logo_header.png" style="vertical-align:middle; margin-right: 3px"
+                      class="f-right">
+                  </div>
+                  <div class="card-block">
+                    <div style="text-align: center; font-size: large; font-weight: bold">RSO</div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <ul class="list list-unstyled">
+                          <li>DISR Sequence #: <span class="text-semibold">{{sequence}}</span></li>
+                          <li>Issued on: <span class="text-semibold">{{readableDate("date")}}</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="table-responsive" style="margin-top: 20px">
+                      <table class="table table-xs">
+                        <thead>
+                          <tr>
+                            <th>Product Name</th>
+                            <th>Previous Stock</th>
+                            <th class="mylg">Loaded Stock</th>
+                            <th>Total Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let row of rows">
+                            <td>{{row.name}}</td>
+                            <td>{{row.previous}}</td>
+                            <td class="mylg">{{row.load}}</td>
+                            <td>{{row.load + row.previous}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <ng-container *ngFor="let cat of products">
+                      <ion-card class="card online-form" *ngIf="cat.items.length > 1">
+                        <div class="card-header">
+                          <div class="card-header-left">
+                            <h5>{{cat.category}} Summary</h5>
+                          </div>
+                          <div class="card-header-right">
+                            <i class="icofont icofont-spinner-alt-5"></i>
+                          </div>
+                        </div>
+                        <div class="card-block">
+                          <h2 class="text-center f-w-400">{{getSummaries(cat.category, 'total')}}</h2>
+                          <p class="text-center text-muted m-b-10">Overall Stock</p>
+                          <div class="b-t-default m-t-5 p-t-10">
+                            <div class="row">
+                              <div class="col m-t-5 text-center">
+                                <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'previous')}}</span>
+                                <p class="text-muted m-b-0">Previous Unsold</p>
+                              </div>
+                              <div class="col m-t-5 text-center">
+                                <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'load')}}</span>
+                                <p class="text-muted m-b-0">Load</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ion-card>
+                    </ng-container>
+                    <div class="row" style="margin-top: 50px;">
+                      <div class="col-xl-12">
+                        <ul class="list list-unstyled text-right f-left">
+                          <li></li>
+                          <li>{{dealer.name}}<span class="text-semibold">RECEIVED BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-left receivedBy">
+                          <li></li>
+                          <li>_______________________<span class="text-semibold">RECEIVED BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-right">
+                          <li></li>
+                          <li>{{released_by}}<span class="text-semibold">RELEASED BY</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="task-list-table">
+                      <p class="task-due"><strong> Amount Due : </strong><strong class="label label-primary" style="font-size: large">₱
+                          {{loadAmount() | number:'.2-2'}}</strong></p>
+                    </div>
+                  </div>
+                  <div class="water-mark">DEPOT COPY</div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="printView == 'RSO - Roving'">
+              <div class="card card-border-info" style="width: 720px">
+                <div class="card-header">
+                  <div class="media">
+                    <div class="media-left media-middle photo-table">
+                      <a href="#">
+                        <img class="media-object img-radius" src="assets/images/no-pic.png" alt="Generic placeholder image">
+                        <div class="live-status2 bg-success"></div>
+                      </a>
+                    </div>
+                    <div class="media-body">
+                      <h6>{{dealer.name}}</h6>
+                      <p>Dealer</p>
+                    </div>
+                    <img alt="logo" height="40" src="assets/images/logo_header.png" style="vertical-align:middle; margin-right: 3px"
+                      class="f-right">
+                  </div>
+                  <div class="card-block">
+                    <div style="text-align: center; font-size: large; font-weight: bold">RSO</div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <ul class="list list-unstyled">
+                          <li>DISR Sequence #: <span class="text-semibold">{{sequence}}</span></li>
+                          <li>Issued on: <span class="text-semibold">{{readableDate("date")}}</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="table-responsive" style="margin-top: 20px">
+                      <table class="table table-xs">
+                        <thead>
+                          <tr>
+                            <th>Product Name</th>
+                            <th>Previous Stock</th>
+                            <th class="mylg">Loaded Stock</th>
+                            <th>Total Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let row of rows">
+                            <td>{{row.name}}</td>
+                            <td>{{row.previous}}</td>
+                            <td class="mylg">{{row.load}}</td>
+                            <td>{{row.load + row.previous}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <ng-container *ngFor="let cat of products">
+                      <ion-card class="card online-form" *ngIf="cat.items.length > 1">
+                        <div class="card-header">
+                          <div class="card-header-left">
+                            <h5>{{cat.category}} Summary</h5>
+                          </div>
+                          <div class="card-header-right">
+                            <i class="icofont icofont-spinner-alt-5"></i>
+                          </div>
+                        </div>
+                        <div class="card-block">
+                          <h2 class="text-center f-w-400">{{getSummaries(cat.category, 'total')}}</h2>
+                          <p class="text-center text-muted m-b-10">Overall Stock</p>
+                          <div class="b-t-default m-t-5 p-t-10">
+                            <div class="row">
+                              <div class="col m-t-5 text-center">
+                                <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'previous')}}</span>
+                                <p class="text-muted m-b-0">Previous Unsold</p>
+                              </div>
+                              <div class="col m-t-5 text-center">
+                                <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'load')}}</span>
+                                <p class="text-muted m-b-0">Load</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ion-card>
+                    </ng-container>
+                    <div class="row" style="margin-top: 50px;">
+                      <div class="col-xl-12">
+                        <ul class="list list-unstyled text-right f-left">
+                          <li></li>
+                          <li>{{dealer.name}}<span class="text-semibold">RECEIVED BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-left receivedBy">
+                          <li></li>
+                          <li>_______________________<span class="text-semibold">RECEIVED BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-right">
+                          <li></li>
+                          <li>{{released_by}}<span class="text-semibold">RELEASED BY</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="task-list-table">
+                      <p class="task-due"><strong> Amount Due : </strong><strong class="label label-info" style="font-size: large">₱
+                          {{loadAmount() | number:'.2-2'}}</strong></p>
+                    </div>
+                  </div>
+                  <div class="water-mark">ROVING DEPOT COPY</div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="printView == 'RSO - Dealer'">
+              <div class="card card-border-success" style="width: 720px">
+                <div class="card-header">
+                  <div class="media">
+                    <div class="media-left media-middle photo-table">
+                      <a href="#">
+                        <img class="media-object img-radius" src="assets/images/no-pic.png" alt="Generic placeholder image">
+                        <div class="live-status2 bg-success"></div>
+                      </a>
+                    </div>
+                    <div class="media-body">
+                      <h6>{{dealer.name}}</h6>
+                      <p>Dealer</p>
+                    </div>
+                    <img alt="logo" height="40" src="assets/images/logo_header.png" style="vertical-align:middle; margin-right: 3px"
+                      class="f-right">
+                  </div>
+                  <div class="card-block">
+                    <div style="text-align: center; font-size: large; font-weight: bold">RSO</div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <ul class="list list-unstyled">
+                          <li>DISR Sequence #: <span class="text-semibold">{{sequence}}</span></li>
+                          <li>Issued on: <span class="text-semibold">{{readableDate("date")}}</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="table-responsive" style="margin-top: 20px">
+                      <table class="table table-xs">
+                        <thead>
+                          <tr>
+                            <th>Product Name</th>
+                            <th>Previous Stock</th>
+                            <th class="mylg">Loaded Stock</th>
+                            <th>Total Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let row of rows">
+                            <td>{{row.name}}</td>
+                            <td>{{row.previous}}</td>
+                            <td class="mylg">{{row.load}}</td>
+                            <td>{{row.load + row.previous}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <ng-container *ngFor="let cat of products">
+                      <ion-card class="card online-form" *ngIf="cat.items.length > 1">
+                        <div class="card-header">
+                          <div class="card-header-left">
+                            <h5>{{cat.category}} Summary</h5>
+                          </div>
+                          <div class="card-header-right">
+                            <i class="icofont icofont-spinner-alt-5"></i>
+                          </div>
+                        </div>
+                        <div class="card-block">
+                          <h2 class="text-center f-w-400">{{getSummaries(cat.category, 'total')}}</h2>
+                          <p class="text-center text-muted m-b-10">Overall Stock</p>
+                          <div class="b-t-default m-t-5 p-t-10">
+                            <div class="row">
+                              <div class="col m-t-5 text-center">
+                                <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'previous')}}</span>
+                                <p class="text-muted m-b-0">Previous Unsold</p>
+                              </div>
+                              <div class="col m-t-5 text-center">
+                                <span class="f-16 f-w-400 m-0">{{getSummaries(cat.category, 'load')}}</span>
+                                <p class="text-muted m-b-0">Load</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ion-card>
+                    </ng-container>
+                    <div class='row'>
+                      <div class='col-xs-12' style='float: none; margin: 0 auto;'>
+                        <ngx-qrcode [qrc-value]="qrValue" [qrc-version]="10" [qrc-correction-level]="'L'" [elementType]="'img'"
+                          *ngIf="id"></ngx-qrcode>
+                      </div>
+                    </div>
+                    <div class="row" style="margin-top: 50px;">
+                      <div class="col-xl-12">
+                        <ul class="list list-unstyled text-right f-left">
+                          <li></li>
+                          <li>{{dealer.name}}<span class="text-semibold">RECEIVED BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-left receivedBy">
+                          <li></li>
+                          <li>_______________________<span class="text-semibold">RECEIVED BY</span></li>
+                        </ul>
+                        <ul class="list list-unstyled text-right f-right">
+                          <li></li>
+                          <li>{{released_by}}<span class="text-semibold">RELEASED BY</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="task-list-table">
+                      <p class="task-due"><strong> Amount Due : </strong><strong class="label label-success" style="font-size: large">₱
+                          {{loadAmount() | number:'.2-2'}}</strong></p>
+                    </div>
+                  </div>
+                  <div class="water-mark">DEALER COPY</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-scroll>
+
     </div>
   </div>
 
-  <ion-fab right bottom>
+  <ion-fab right bottom *ngIf="showSubmit">
     <button ion-fab color="primary" (click)="submit()">
       <ion-icon name="send"></ion-icon>
     </button>
   </ion-fab>
+  <popup-menu (menuOpen)="hideMySubmit()" (menuClose)="showMySubmit()" (btnPush)="menuBtn($event)" [btns]='[{title: "Add Item", icon: "list-box", badge: false}, {title: "Share RSO", icon: "bookmark", badge: false}, {title: "Share DISR", icon: "folder", badge: false}]'></popup-menu>

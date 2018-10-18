@@ -22,11 +22,13 @@ export class ProductCategoryPage {
   title: string
   products: any = []
   myMenu: any = []
+  reorder: boolean = false
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public myFunctionProvider: MyFunctionProvider,
     public menuItems: MenuItems,
   ) {
+    this.myFunctionProvider.spinner(false, "")
     let myMenu = this.menuItems.getAll()
     this.myMenu = myMenu
     this.id = navParams.get("id")
@@ -35,17 +37,22 @@ export class ProductCategoryPage {
 
   loadIt(){
     this.products = []
-    this.myFunctionProvider.dbQuery("SELECT mu.name AS unit_name, p.pack AS pack, p.id AS product_id, p.thumbnail AS product_thumbnail, p.name AS product_name, pc.name AS category_name, (ifnull((SELECT SUM(qty) FROM inventories WHERE type = 1 AND product_id = p.id), 0) - ifnull((SELECT SUM(qty) FROM inventories WHERE type = 2 AND product_id = p.id), 0)) AS numKilos FROM products p INNER JOIN product_categories pc ON p.category = pc.id INNER JOIN measurement_units mu ON p.measurement_unit = mu.id WHERE p.category = ? ORDER BY p.sequence ASC", [this.id]).then((p: any) => {
+    this.myFunctionProvider.getProducts(this.id).then((p: any) => {
       let total = 0
       for(let x in p){
         p[x].product_thumbnail = (p[x].product_thumbnail) ? this.myFunctionProvider.sanitize(p[x].product_thumbnail) : "assets/images/bc5.jpg"
         this.products.push(p[x])
-        total += p[x].numKilos
+        total += p[x].stocks
       }
       console.log("Products", this.products)
       let i = _.findIndex(this.myMenu[0].main[0].children, { 'name': this.title});
       this.myMenu[0].main[0].children[i].badge = [{type: "warning", value: total}]
     })
+  }
+
+  modify(pid){
+    this.myFunctionProvider.spinner(true, "Please wait")
+    this.myFunctionProvider.nav.push("AddProductPage", {cat_id: this.id, id: pid})
   }
 
   reorderItems(indexes) {
@@ -56,8 +63,10 @@ export class ProductCategoryPage {
     for(let x in this.products){
       arr.push(["UPDATE products SET sequence = ?, sync = 3 WHERE id = ?", [x, this.products[x].product_id]])
     }
-
-    this.myFunctionProvider.dbQueryBatch(arr)
+    this.myFunctionProvider.spinner(true, "Updating...")
+    this.myFunctionProvider.dbQueryBatch(arr).then(() => {
+      this.myFunctionProvider.spinner(false, "")
+    })
   }
 
   ionViewWillEnter(){
@@ -69,7 +78,18 @@ export class ProductCategoryPage {
   }
 
   pushAddProduct(){
-    this.myFunctionProvider.nav.push("AddProductPage", {id: this.id})
+    this.myFunctionProvider.spinner(true, "Please wait")
+    this.myFunctionProvider.nav.push("AddProductPage", {cat_id: this.id})
+  }
+
+  menuBtn(e){
+    console.log(e)
+    if(e.title === "Arrange"){
+      this.reorder = (this.reorder) ? false : true
+    }
+    if(e.title === "New Product"){
+      this.pushAddProduct()
+    }
   }
 
 }

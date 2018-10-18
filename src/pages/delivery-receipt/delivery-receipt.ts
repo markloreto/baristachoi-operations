@@ -1,6 +1,6 @@
 import { MyFunctionProvider } from './../../providers/my-function/my-function';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { ActionSheetController } from 'ionic-angular';
 import moment from 'moment'
@@ -19,6 +19,7 @@ import moment from 'moment'
 })
 export class DeliveryReceiptPage {
   rows: any = [];
+  staffs: any = []
   columns: any = [
     { prop: 'date', name: 'Date', minWidth: 130, width: 130 },
     { prop: 'dr', name: 'DR #', minWidth: 60, width: 60  },
@@ -33,13 +34,17 @@ export class DeliveryReceiptPage {
     offset: 0,
     limit: 5
   }
+
+  filters: any = {}
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     private screenOrientation: ScreenOrientation,
     private myFunctionProvider: MyFunctionProvider,
-    public actionSheetCtrl: ActionSheetController
+    public actionSheetCtrl: ActionSheetController,
+    public modalCtrl: ModalController
   ) {
+    this.myFunctionProvider.spinner(true, "Please wait")
     //this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.LANDSCAPE);
 
     /* this.myFunctionProvider.dbQuery("SELECT * FROM inventories", []).then((q: any) => {
@@ -50,10 +55,54 @@ export class DeliveryReceiptPage {
       console.log("attachments", q)
     }) */
 
+    this.myFunctionProvider.dbQuery("SELECT id AS 'value', name AS 'label' FROM staffs WHERE role_id = 4", []).then((s: any) => {
+      this.staffs = s
+    })
+
   }
 
-  loadIt(pageInfo){
+  loadIt(pageInfo, filters){
     console.log("Page Info", pageInfo)
+
+    let filterNum = 0
+    let where = "";
+
+
+    for(let x in filters){
+      filterNum++
+      if(filterNum === 1)
+        where += "WHERE "
+
+      if(x === "date"){
+        where += (where !== "WHERE ") ? " AND " : ""
+        filters.date = filters.date.slice(0, filters.date.lastIndexOf(" "))
+        filters.date += " 00:00:00"
+        where += "myDr.created_date " + this.myFunctionProvider.operators(filters.dateType) + " Datetime('" + filters.date + "')"
+      }
+
+      if(x === "createdBy"){
+        where += (where !== "WHERE ") ? " AND " : ""
+        where += "s.id IN ("+filters.createdBy.join()+")"
+      }
+
+      if(x === "dr"){
+        where += (where !== "WHERE ") ? " AND " : ""
+        where += "myDr.dr = " + filters.dr
+      }
+
+      if(x === "numberOfKilos"){
+        where += (where !== "WHERE ") ? " AND " : ""
+        where += "numKilos " + this.myFunctionProvider.operators(filters.numberOfKilosType) + " " + filters.numberOfKilos
+      }
+
+      if(x === "amount"){
+        where += (where !== "WHERE ") ? " AND " : ""
+        where += "amount " + this.myFunctionProvider.operators(filters.amountType) + " " + filters.amount
+      }
+    }
+
+    console.log("WHERE", where)
+
     this.rows = []
     this.myFunctionProvider.spinner(true, "Please wait")
     this.myFunctionProvider.dbQuery("SELECT COUNT(*) AS num FROM delivery_receipts", []).then((data: any) => {
@@ -61,7 +110,7 @@ export class DeliveryReceiptPage {
       console.log("Total DRS:", data[0].num)
       this.page.offset = pageInfo.offset;
 
-      this.myFunctionProvider.dbQuery("SELECT s.id AS staff_id, s.name AS staff_name, myDr.*, ifnull((SELECT SUM(inv.qty) FROM inventories inv JOIN products p ON inv.product_id = p.id WHERE reference_id = myDr.id AND p.category = 1 AND inv.type = 1 AND module_id = 1), 0) AS numKilos, (SELECT SUM(qty * cost) FROM inventories WHERE reference_id = myDr.id AND module_id = 1) AS amount FROM delivery_receipts myDr INNER JOIN staffs s ON myDr.staff_id = s.id ORDER BY myDr.dr DESC LIMIT 5 OFFSET " + (pageInfo.offset * this.page.limit), []).then((drs: any) => {
+      this.myFunctionProvider.dbQuery("SELECT s.id AS staff_id, s.name AS staff_name, myDr.*, ifnull((SELECT SUM(inv.qty) FROM inventories inv JOIN products p ON inv.product_id = p.id WHERE reference_id = myDr.id AND p.category = 1 AND inv.type = 1 AND module_id = 1), 0) AS numKilos, (SELECT SUM(qty * cost) FROM inventories WHERE reference_id = myDr.id AND module_id = 1) AS amount FROM delivery_receipts myDr INNER JOIN staffs s ON myDr.staff_id = s.id " + where + " ORDER BY myDr.dr DESC LIMIT 5 OFFSET " + (pageInfo.offset * this.page.limit), []).then((drs: any) => {
         let array = []
         console.log("Drs", drs)
         for(let x in drs){
@@ -108,7 +157,7 @@ export class DeliveryReceiptPage {
 
                   this.myFunctionProvider.deleteSync(array).then(() => {
                     this.myFunctionProvider.spinner(false, "")
-                    this.loadIt({offset: this.page.offset})
+                    this.loadIt({offset: this.page.offset}, this.filters)
                   })
                 })
               })
@@ -134,7 +183,8 @@ export class DeliveryReceiptPage {
   }
 
   ionViewWillEnter(){
-    this.loadIt({ offset: 0 })
+    if(Object.keys(this.filters).length === 0)
+      this.loadIt({ offset: 0 }, this.filters)
   }
 
   ionViewDidLoad() {
@@ -159,8 +209,31 @@ export class DeliveryReceiptPage {
 
   }
 
+  openModal(pageName) {
+    let m = this.modalCtrl.create(pageName, {staffs: this.staffs}/* , { cssClass: 'inset-modal' } */)
+    m.onDidDismiss(data => {
+     console.log("Submitted", data);
+     this.filters = data
+     this.loadIt({ offset: 0 }, data)
+   });
+   m.present()
+
+  }
+
   add(){
+    this.myFunctionProvider.spinner(true, "Please wait")
     this.myFunctionProvider.nav.push("AddDrPage")
+  }
+
+  menuBtn(e){
+    console.log(e)
+    if(e.title === "New Delivery Receipt"){
+      this.add()
+    }
+    if(e.title === "filter")
+      this.openModal("DeliveryReceiptFilterPage")
+    if(e.title === "Reset Filters")
+      this.loadIt({ offset: 0 }, {})
   }
 
 }

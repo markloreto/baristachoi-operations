@@ -18,9 +18,5 @@
     </ngx-datatable>
 
   </ion-card>
-  <ion-fab top right edge>
-    <button ion-fab mini color="secondary" (click)="add()">
-      <ion-icon name="add"></ion-icon>
-    </button>
-  </ion-fab>
+  <popup-menu (btnPush)="menuBtn($event)" [btns]='[{title: "New Delivery Receipt", icon: "add", badge: false}, {title: "filter", icon: "funnel", badge: false}, {title: "Reset Filters", icon: "refresh-circle", badge: false}]'></popup-menu>
 </ion-content>

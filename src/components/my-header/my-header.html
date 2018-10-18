@@ -2,12 +2,18 @@
     <button ion-button icon-only menuToggle *ngIf="menuEnable == true" >
       <ion-icon name="menu"></ion-icon>
     </button>
-  
+
     <ion-title>
-      <img alt="logo" height="40" src="assets/images/logo_header.png" style="vertical-align:middle; margin-right: 3px"> 
+      <img alt="logo" height="40" src="assets/images/logo_header.png" style="vertical-align:middle; margin-right: 3px">
       <span>{{title}}</span>
     </ion-title>
-  
+
+    <ion-buttons end [ngClass]="{'rotate-refresh': synchronizeProvider.synching}">
+      <button ion-button [color]="'secondary'" icon-only [disabled]="synchronizeProvider.synching" (click)="sync()">
+        <ion-icon [name]="'sync'"></ion-icon>
+      </button>
+    </ion-buttons>
+
     <ion-buttons end *ngIf="btn1.enable && btn1.title == ''">
       <button ion-button [color]="btn1.color" icon-only (click)="button1Click()">
         <ion-icon [name]="btn1.icon"></ion-icon>
@@ -19,7 +25,7 @@
           <ion-icon [name]="btn1.icon"></ion-icon>
         </button>
     </ion-buttons>
-  
+
     <ion-buttons end *ngIf="btn2.enable && btn2.title == ''">
         <button ion-button [color]="btn2.color" icon-only (click)="button2Click()">
           <ion-icon [name]="btn2.icon"></ion-icon>

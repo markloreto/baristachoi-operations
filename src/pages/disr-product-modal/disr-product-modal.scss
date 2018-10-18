@@ -3,4 +3,8 @@ page-disr-product-modal {
     text-align: right !important;
     width: 10em !important;
   }
+
+  .enabled {background: map-get($colors, secondary)}
+
+  .disabled {background: lightgray}
 }

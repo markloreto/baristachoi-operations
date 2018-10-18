@@ -4,6 +4,7 @@ import { DeliveryReceiptPage } from './delivery-receipt';
 import { MyHeaderComponentModule } from '../../components/my-header/my-header.module';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { PopupMenuComponentModule } from '../../components/popup-menu/popup-menu.module';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,8 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
   imports: [
     IonicPageModule.forChild(DeliveryReceiptPage),
     MyHeaderComponentModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    PopupMenuComponentModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [ScreenOrientation]

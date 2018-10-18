@@ -1,0 +1,49 @@
+<!--
+  Generated template for the EndoresmentPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <my-header title="Endorsement" headerColor="primary" [menuEnable]="true"></my-header>
+  <ion-toolbar color="primary">
+    <ion-searchbar (input)="getItems($event)" (ionClear)="initializeItems()"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <ion-card>
+    <ion-item class="myItems">
+      <ion-textarea autocorrect="on" placeholder="Notes" rows="7" [(ngModel)]="notes"></ion-textarea>
+    </ion-item>
+  </ion-card>
+
+  <ion-card>
+    <ion-item-group class="mb5em">
+      <ng-container *ngFor="let category of categories">
+        <ion-item-divider color="light">{{category.category}}</ion-item-divider>
+        <ion-item *ngFor="let product of category.items">
+          <ion-thumbnail item-start>
+            <img [src]="product.product_thumbnail">
+          </ion-thumbnail>
+          <ion-label>
+            {{product.product_name}}
+            <p>{{myFunctionProvider.getQtyHuman(product.stocks, product.product_pack, product.unit_name)}}</p>
+          </ion-label>
+
+          <div item-end class="rightItem">
+            <div class="numKilos">{{product.stocks}}</div>
+            <p class="unitName">{{(product.stocks > 1) ? product.unit_name + "s" : product.unit_name}}</p>
+          </div>
+          <ion-checkbox item-end [(ngModel)]="product.checked" (ionChange)="updateC()" [disabled]="product.disabled" [checked]="product.checked"></ion-checkbox>
+        </ion-item>
+      </ng-container>
+    </ion-item-group>
+  </ion-card>
+  <ion-fab right bottom>
+    <button ion-fab color="primary" (click)="submit()">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </ion-fab>
+</ion-content>

@@ -1,7 +1,9 @@
+import { SynchronizeProvider } from './../../providers/synchronize/synchronize';
 import { MyFunctionProvider } from './../../providers/my-function/my-function';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Events, MenuController } from 'ionic-angular';
 import swal from 'sweetalert2';
+import * as moment from 'moment'
 /**
  * Generated class for the LoginPage page.
  *
@@ -15,82 +17,43 @@ import swal from 'sweetalert2';
 })
 export class LoginPage {
   staffs: any = []
-  internetConnection: () => void
+  updateStaffs: () => void
   loaded: boolean = false
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public myFunctionProvider: MyFunctionProvider,
     public events: Events,
-    public menuCtrl: MenuController
+    public menuCtrl: MenuController,
+    private sync: SynchronizeProvider
   ) {
     this.loadList()
-    this.internetConnection = () => {
+    this.updateStaffs = () => {
       this.loadList()
     }
-    this.events.subscribe("network:connected", this.internetConnection)
+    this.events.subscribe("sync_pull:done", this.updateStaffs)
     console.log("Settings", this.myFunctionProvider.settings)
+
   }
 
-  updateStaffs(array){
-    this.myFunctionProvider.APIGet("getRoles").then((result: any) => {
-      let d = result.data
-      let a = []
-      for(let x in d){
-        a.push(["INSERT OR REPLACE INTO roles (id, name) VALUES (?, ?)", [d[x].id, d[x].display_name]])
-      }
-
-      this.myFunctionProvider.dbQueryBatch(a).then((rolesB: any) => {
-        console.log("roles batch", rolesB)
-        let b = []
-        for(let x in array){
-          b.push(["INSERT OR REPLACE INTO staffs (id, depot_id, name, photo, thumbnail, role_id, sync) VALUES (?, ?, ?, ?, ?, ?, ?)", [array[x].id, array[x].depot_id, array[x].name, array[x].photo, array[x].thumbnail, array[x].role_id, 2]])
-        }
-        this.myFunctionProvider.dbQueryBatch(b).then((staffsB: any) => {
-          console.log("staff batch", staffsB)
-          this.loaded = true
-          this.loadList()
-        })
-      })
-    })
-  }
-
-  loadList(){
+  loadList() {
     this.myFunctionProvider.spinner(true, "Retrieving List...")
     this.myFunctionProvider.dbQuery("SELECT staffs.*, roles.name AS role_name FROM staffs, roles WHERE staffs.role_id = roles.id AND roles.id = 4", []).then((staffs: any) => {
+      this.myFunctionProvider.spinner(false, "")
       console.log("Staffs", staffs)
-      this.staffs = staffs
 
-      if(!this.loaded){
-        this.myFunctionProvider.checkInternetConnection().then((i:any) => {
-          if(i){
-            if(!staffs.length)
-
-            this.myFunctionProvider.APIGet("staff").then((result: any) => {
-              console.log(result)
-              if(!staffs.length)
-                this.myFunctionProvider.spinner(false, "")
-              if(result.data.length)
-                this.updateStaffs(result.data)
-            })
-          }
-          else{
-            if(!staffs.length)
-              swal({
-                type: 'warning',
-                title: 'Oops...',
-                text: 'Failed to retrieve the list... Please check your internet connection'
-              })
-            this.myFunctionProvider.spinner(false, "")
-          }
-        })
+      if(staffs.length == 0){
+        this.syncIt()
       }else{
-        this.myFunctionProvider.spinner(false, "")
+        this.staffs = staffs
       }
-
     })
   }
 
-  login(staff){
+  syncIt(){
+    this.sync.syncPull(["roles", "staffs"])
+  }
+
+  login(staff) {
     let self = this
     swal({
       title: 'Password',
@@ -101,9 +64,9 @@ export class LoginPage {
       confirmButtonText: 'Logged me in!',
       preConfirm: function (password) {
         return new Promise(function (resolve, reject) {
-          if(password != self.myFunctionProvider.settings.passcode){
+          if (password != self.myFunctionProvider.settings.passcode) {
             reject("Wrong Password!")
-          }else{
+          } else {
             resolve()
           }
         });
@@ -115,6 +78,9 @@ export class LoginPage {
 
       this.myFunctionProvider.dbQuery("SELECT data FROM settings WHERE id = 5", []).then((as: any) => {
         //todo: accountanble staff
+        let accountable_staff = as[0].data
+        if(accountable_staff == null)
+          this.myFunctionProvider.firstTime = true
         this.myFunctionProvider.dbQueryBatch([
           ["UPDATE settings SET data = ? WHERE id = ?", [staff.id, 4]],
           ["UPDATE settings SET data = ? WHERE id = ?", [staff.id, 5]]
@@ -125,7 +91,7 @@ export class LoginPage {
           this.myFunctionProvider.setSettings().then((settings: any) => {
             this.events.publish("staff:login", settings)
           })
-          setTimeout(()=>{
+          setTimeout(() => {
             this.myFunctionProvider.spinner(false, "")
           }, 500)
 
@@ -137,12 +103,19 @@ export class LoginPage {
 
   }
 
+  menuBtn(e){
+    console.log(e)
+    if(e.title === "Sync"){
+      this.syncIt()
+    }
+  }
+
   ionViewDidLoad() {
     console.log('ionViewDidLoad LoginPage');
   }
 
   ionViewWillLeave() {
-    this.events.unsubscribe('network:disconnected', this.internetConnection);
+    this.events.unsubscribe('sync_pull:done', this.updateStaffs);
   }
 
 }

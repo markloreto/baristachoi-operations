@@ -10,25 +10,21 @@
 
 
 <ion-content>
-  <ion-card>
-    <ion-list reorder="true" (ionItemReorder)="reorderItems($event)">
-      <button class="itemDivider" ion-item *ngFor="let product of products">
-        <ion-thumbnail item-start style="margin: 8px 0px 8px 0 !important;">
+  <ion-card  class="mb5em">
+    <ion-list [reorder]="reorder" (ionItemReorder)="reorderItems($event)">
+      <button class="itemDivider" ion-item *ngFor="let product of products" (click)="modify(product.product_id)">
+        <ion-thumbnail item-start >
           <img [src]="product.product_thumbnail">
         </ion-thumbnail>
         <h2>{{product.product_name}}</h2>
-        <p>{{myFunctionProvider.getQtyHuman(product.numKilos, product.pack, product.unit_name)}}</p>
+        <p>{{myFunctionProvider.getQtyHuman(product.stocks, product.product_pack, product.unit_name)}}</p>
         <div item-end class="rightItem">
-          <div class="numKilos">{{product.numKilos}}</div>
-          <p class="unitName">{{(product.numKilos > 1) ? product.unit_name + "s" : product.unit_name}}</p>
+          <div class="numKilos">{{product.stocks}}</div>
+          <p class="unitName">{{(product.stocks > 1) ? product.unit_name + "s" : product.unit_name}}</p>
         </div>
       </button>
     </ion-list>
   </ion-card>
 
-  <ion-fab top right edge>
-    <button ion-fab mini color="secondary" (click)="pushAddProduct()">
-      <ion-icon name="add"></ion-icon>
-    </button>
-  </ion-fab>
+  <popup-menu (btnPush)="menuBtn($event)" [btns]='[{title: "Arrange", icon: "logo-buffer", badge: false}, {title: "New Product", icon: "add", badge: false}]'></popup-menu>
 </ion-content>

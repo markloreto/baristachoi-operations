@@ -14,41 +14,26 @@ export class PopupMenuComponent {
   openMenu = false;
   @Input() btns: any = []
   @Output() btnPush = new EventEmitter<any>();
+  @Output() menuOpen = new EventEmitter<any>();
+  @Output() menuClose = new EventEmitter<any>();
   constructor() {
     console.log('Hello PopupMenuComponent Component');
 
   }
 
   myBtn(btn){
+    this.togglePopupMenu()
     this.btnPush.emit(btn)
   }
 
   togglePopupMenu() {
-    return this.openMenu = !this.openMenu;
+    this.openMenu = !this.openMenu
+    if(this.openMenu)
+      this.menuOpen.emit(null)
+    else
+      this.menuClose.emit(null)
+    return this.openMenu;
   }
-  goToAccount() {
-    alert('Account clicked.');
-    this.togglePopupMenu();
-  }
-  goToHome() {
-    alert('Home clicked.');
-    this.togglePopupMenu();
-  }
-  goToCups() {
-    alert('Cups clicked.');
-    this.togglePopupMenu();
-  }
-  goToLeaderboard() {
-    alert('Leaderboard clicked.');
-    this.togglePopupMenu();
-  }
-  goToHelp() {
-    alert('Help clicked.');
-    this.togglePopupMenu();
-  }
-  goToShop() {
-    alert('Shop clicked.');
-    this.togglePopupMenu();
-  }
+
 
 }

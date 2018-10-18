@@ -1,0 +1,17 @@
+<!--
+  Generated template for the DeliveryReceiptFilterPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+    <my-header title="Filter" headerColor="secondary" [menuEnable]="false"></my-header>
+  </ion-header>
+
+
+<ion-content>
+  <ion-card>
+      <formio #ref [form]='{"title": "Delivery Receipt Filter", "components": components}' (submit)="onSubmit($event)" [options]="options"></formio>
+  </ion-card>
+
+</ion-content>

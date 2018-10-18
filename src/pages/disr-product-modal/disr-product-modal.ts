@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController  } from 'ionic-angular';
+import { IziToastSettings, default as iziToast } from 'izitoast';
 
 /**
  * Generated class for the DisrProductModalPage page.
@@ -16,6 +17,8 @@ import { IonicPage, NavController, NavParams, ViewController  } from 'ionic-angu
 export class DisrProductModalPage {
   title: any
   row: any
+  loadEnabled: boolean
+  product: any
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -23,22 +26,34 @@ export class DisrProductModalPage {
   ) {
     this.row = navParams.get("row")
     this.title = this.row.name + " Details"
+    this.loadEnabled = navParams.get("loadEnabled")
+    this.product = navParams.get("product")
   }
 
   submit(){
+    if(isNaN(this.row.amount)){
+      iziToast.error({
+        title: 'Wrong Input',
+        message: 'Invalid characted detected',
+      });
+      return
+    }
     if(this.row.price != "")
       this.viewCtrl.dismiss(this.row);
   }
 
   compute() {
     let r = this.row
-    if (r.load !== "")
+
+    if (r.load !== ""){
+      r.load = parseInt(r.load)
       r.total = parseInt(r.load) + parseInt(r.previous)
+    }
     if (r.remaining !== "") {
       r.remaining = parseInt(r.remaining)
       r.sold = parseInt(r.total) - r.remaining
       if(r.price !== "")
-        r.amount = parseInt(r.sold) * parseFloat(r.price)
+        r.amount = (parseInt(r.sold) * parseFloat(r.price)).toFixed(2)
     }
 
     if (r.remaining === "") {

@@ -64,7 +64,7 @@ var MENUITEMS = [
       },
     ]
   },
-  {
+  /* {
     label: "Tools",
     main: [
       {
@@ -74,19 +74,26 @@ var MENUITEMS = [
         type: 'link',
         icon: 'ti-cloud'
       },
+      {
+        state: 'EndorsementListPage',
+        short_label: 'ELP',
+        name: 'Endorsement List',
+        type: 'link',
+        icon: 'icofont icofont-holding-hands'
+      },
     ]
-  },
+  }, */
   {
     label: 'Navigation',
     main: [
       {
-        state: 'dashboard',
-        short_label: 'D',
-        name: 'Dashboard',
+        state: 'StaffPage',
+        short_label: 'SP',
+        name: 'Staff',
         type: 'link',
-        icon: 'ti-home'
+        icon: 'ti-id-badge'
       },
-      {
+      /* {
         state: 'basic',
         short_label: 'B',
         name: 'Basic Components',
@@ -109,10 +116,10 @@ var MENUITEMS = [
         name: 'Notifications',
         type: 'link',
         icon: 'ti-crown'
-      },
+      }, */
     ],
   },
-  {
+  /* {
     label: 'Tables',
     main: [
       {
@@ -245,7 +252,7 @@ var MENUITEMS = [
         target: true
       }
     ]
-  }
+  } */
 ];
 
 @Injectable()

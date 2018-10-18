@@ -26,6 +26,10 @@ import { File } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { PhotoViewer } from '@ionic-native/photo-viewer';
 import { Deeplinks } from '@ionic-native/deeplinks';
+import { FileServiceProvider } from '../providers/file-service/file-service';
+import { SynchronizeProvider } from '../providers/synchronize/synchronize';
+import { AppVersion } from '@ionic-native/app-version';
+import { NativeStorage } from '@ionic-native/native-storage';
 
 @NgModule({
   declarations: [
@@ -63,7 +67,11 @@ import { Deeplinks } from '@ionic-native/deeplinks';
     File,
     FileChooser,
     PhotoViewer,
-    Deeplinks
+    Deeplinks,
+    FileServiceProvider,
+    SynchronizeProvider,
+    AppVersion,
+    NativeStorage
   ]
 })
 export class AppModule {}

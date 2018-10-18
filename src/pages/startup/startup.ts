@@ -50,6 +50,9 @@ export class StartupPage {
   selectedDepot: number = 0
   selectedDepot2: boolean = false
   selectedDepotName: string = ""
+  province: string = ''
+  municipal: string = ''
+  brgy: string = ''
   internetConnection: () => void
 
   depotList: any = []
@@ -149,6 +152,9 @@ export class StartupPage {
     console.log(ev)
     if(this.selectedDepot){
       this.selectedDepotName = ev.name
+      this.province = ev.province
+      this.municipal = ev.municipal
+      this.brgy = ev.brgy
       this.openAjaxSwal()
     }
   }
@@ -192,12 +198,13 @@ export class StartupPage {
           }
 
           this.myFunctionProvider.dbQueryBatch([
-            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [1, "time_in", this.myFunctionProvider.getTimestamp()]],
-            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [2, "depot", JSON.stringify({name: this.selectedDepotName, id: this.selectedDepot})]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [1, "time_in", null]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [2, "depot", JSON.stringify({name: this.selectedDepotName, id: this.selectedDepot, province: this.province, municipal: this.municipal, brgy: this.brgy})]],
             ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [3, "passcode", this.passcode]],
             ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [4, "logged_staff", null]],
-            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [5, "accountable_staff", this.passcode]],
-            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [6, "last_push_sync", 0]]
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [5, "accountable_staff", null]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [6, "last_push_sync", null]],
+            ["INSERT OR REPLACE INTO settings VALUES (?, ?, ?)", [7, "timestamp", this.myFunctionProvider.getTimestamp()]]
           ]).then(() => {
 
             this.myFunctionProvider.setSettings()

@@ -1,0 +1,2 @@
+this.image = (!this.photo) ? "assets/images/bc5.jpg" : this.myFunctionProvider.sanitize(this.photo)
+depot: this.myFunctionProvider.settings.depot.id
